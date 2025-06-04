@@ -3,9 +3,10 @@ import { ErrorHandler } from "../middlewares/errorMiddleware.js";
 import sendVerificationCode from "../utils/sendVerificationCode.js";
 import bcrypt from "bcrypt";
 import { sendToken } from "../utils/sendToken.js";
+import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
 
 // Register user
-export const register = async (req, res, next) => {
+export const register = catchAsyncErrors(async (req, res, next) => {
   try {
     const { name, email, password } = req.body;
 
@@ -79,9 +80,9 @@ export const register = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+});
 
-export const verifyOtp = async (req, res, next) => {
+export const verifyOtp = catchAsyncErrors(async (req, res, next) => {
   try {
     const { email, otp } = req.body;
 
@@ -131,4 +132,28 @@ export const verifyOtp = async (req, res, next) => {
   } catch (error) {
     return next(new ErrorHandler(error.message, 500));
   }
-};
+});
+
+export const login = catchAsyncErrors(async (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new ErrorHandler("Please fill all fields", 400));
+  }
+
+  const user = await User.findOne({ email, accountVerified: true }).select(
+    "+password"
+  );
+
+  if (!user) {
+    return next(new ErrorHandler("Invalid email or password", 404));
+  }
+
+  const isPasswordCorrect = await bcrypt.compare(password, user.password);
+
+  if (!isPasswordCorrect) {
+    return next(new ErrorHandler("Invalid email or password", 404));
+  }
+
+  sendToken(user, 200, "Login successful", res);
+});

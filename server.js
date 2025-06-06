@@ -3,11 +3,11 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import dotenv from "dotenv";
-import connectDatabase from "./config/db.js";
+import connectDatabase from "./db.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
 
-dotenv.config({ path: "./config/config.env" });
+dotenv.config({ path: "./.env" });
 
 const app = express();
 

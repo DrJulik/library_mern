@@ -3,7 +3,7 @@ import { ErrorHandler } from "../middlewares/errorMiddleware.js";
 import sendVerificationCode from "../utils/sendVerificationCode.js";
 import bcrypt from "bcrypt";
 import { sendToken } from "../utils/sendToken.js";
-import catchAsyncErrors from "../middlewares/catchAsyncErrors.js";
+import { catchAsyncErrors } from "../middlewares/errorMiddleware.js";
 
 // Register user
 export const register = catchAsyncErrors(async (req, res, next) => {
@@ -156,4 +156,24 @@ export const login = catchAsyncErrors(async (req, res, next) => {
   }
 
   sendToken(user, 200, "Login successful", res);
+});
+
+export const logout = catchAsyncErrors(async (req, res, next) => {
+  res.cookie("token", "", {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Logged out successfully",
+  });
+});
+
+export const getUser = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user;
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });

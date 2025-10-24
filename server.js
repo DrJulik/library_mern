@@ -6,7 +6,8 @@ import dotenv from "dotenv";
 import connectDatabase from "./db.js";
 import { errorMiddleware } from "./middlewares/errorMiddleware.js";
 import authRoutes from "./routes/authRoutes.js";
-
+import bookRoutes from "./routes/bookRoutes.js";
+import borrowRoutes from "./routes/borrowRoutes.js";
 dotenv.config({ path: "./.env" });
 
 const app = express();
@@ -33,6 +34,12 @@ connectDatabase();
 
 // Auth Routes
 app.use("/api/v1/auth", authRoutes);
+
+// Book Routes
+app.use("/api/v1/book", bookRoutes);
+
+// Borrow Routes
+app.use("/api/v1/borrow", borrowRoutes);
 
 // Error handling middleware
 app.use(errorMiddleware);

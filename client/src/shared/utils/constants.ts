@@ -21,32 +21,32 @@ export const STATUS_COLORS: Record<string, string> = {
   available: 'bg-green-100 text-green-800',
 };
 
-// API endpoints
+// API endpoints (v1)
 export const API_ROUTES = {
   AUTH: {
-    REGISTER: '/auth/register',
-    LOGIN: '/auth/login',
-    LOGOUT: '/auth/logout',
-    VERIFY_OTP: '/auth/verify-otp',
-    ME: '/auth/me',
-    FORGOT_PASSWORD: '/auth/password/forgot',
-    RESET_PASSWORD: '/auth/password/reset',
-    UPDATE_PASSWORD: '/auth/password/update',
+    REGISTER: '/v1/auth/register',
+    LOGIN: '/v1/auth/login',
+    LOGOUT: '/v1/auth/logout',
+    VERIFY_OTP: '/v1/auth/verify-otp',
+    ME: '/v1/auth/me',
+    FORGOT_PASSWORD: '/v1/auth/password/forgot',
+    RESET_PASSWORD: '/v1/auth/password/reset',
+    UPDATE_PASSWORD: '/v1/auth/password/update',
   },
   BOOKS: {
-    ALL: '/books/all',
-    ADD: '/books/add',
-    DELETE: '/books/delete',
+    ALL: '/v1/book/all',
+    ADD: '/v1/book/add',
+    DELETE: '/v1/book/delete',
   },
   BORROW: {
-    MY_BOOKS: '/borrow/my-borrowed-books',
-    ALL_RECORDS: '/borrow/borrowed-books-by-users',
-    RECORD_BORROW: '/borrow/record-borrowed-book',
-    RECORD_RETURN: '/borrow/record-returned-book',
+    MY_BOOKS: '/v1/borrow/my-borrowed-books',
+    ALL_RECORDS: '/v1/borrow/borrowed-books-by-users',
+    RECORD_BORROW: '/v1/borrow/record-borrowed-book',
+    RECORD_RETURN: '/v1/borrow/record-returned-book',
   },
   USERS: {
-    ALL: '/users/all',
-    ADD_ADMIN: '/users/add/admin',
+    ALL: '/v1/user/all',
+    ADD_ADMIN: '/v1/user/add/admin',
   },
 } as const;
 

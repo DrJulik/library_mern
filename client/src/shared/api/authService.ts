@@ -18,49 +18,49 @@ interface ResetPasswordData {
 const authService = {
   // Register new user
   register: async (userData: RegisterData): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/register', userData);
+    const response = await api.post<AuthResponse>('/v1/auth/register', userData);
     return response.data;
   },
 
   // Verify OTP
   verifyOtp: async (email: string, otp: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/verify-otp', { email, otp });
+    const response = await api.post<AuthResponse>('/v1/auth/verify-otp', { email, otp });
     return response.data;
   },
 
   // Login
   login: async (email: string, password: string): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login', { email, password });
+    const response = await api.post<AuthResponse>('/v1/auth/login', { email, password });
     return response.data;
   },
 
   // Logout
   logout: async (): Promise<{ success: boolean; message: string }> => {
-    const response = await api.get('/auth/logout');
+    const response = await api.get('/v1/auth/logout');
     return response.data;
   },
 
   // Get current user
   getCurrentUser: async (): Promise<{ success: boolean; user: User }> => {
-    const response = await api.get('/auth/me');
+    const response = await api.get('/v1/auth/me');
     return response.data;
   },
 
   // Forgot password
   forgotPassword: async (email: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.post('/auth/password/forgot', { email });
+    const response = await api.post('/v1/auth/password/forgot', { email });
     return response.data;
   },
 
   // Reset password
   resetPassword: async (token: string, password: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.put(`/auth/password/reset/${token}`, { password });
+    const response = await api.put(`/v1/auth/password/reset/${token}`, { password });
     return response.data;
   },
 
   // Update password
   updatePassword: async (oldPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.put('/auth/password/update', { oldPassword, newPassword });
+    const response = await api.put('/v1/auth/password/update', { oldPassword, newPassword });
     return response.data;
   },
 };

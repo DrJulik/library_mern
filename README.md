@@ -106,8 +106,10 @@ The backend API is built with:
 
 ```bash
 cd server
-pnpm dev      # Development with nodemon
-pnpm start    # Production
+pnpm dev        # Development with hot reload (tsx)
+pnpm build      # Build TypeScript to JavaScript
+pnpm start      # Production
+pnpm typecheck  # Type checking only
 ```
 
 ## 🎨 Client (Frontend)
@@ -149,7 +151,7 @@ The frontend is fully configured with **React + TypeScript + Tailwind CSS**. See
 ## 🔧 Technology Stack
 
 ### Backend
-- Node.js
+- Node.js with TypeScript
 - Express.js
 - MongoDB with Mongoose
 - JWT for authentication
@@ -157,6 +159,7 @@ The frontend is fully configured with **React + TypeScript + Tailwind CSS**. See
 - Nodemailer for emails
 - Cloudinary for image storage
 - Node-cron for scheduled tasks
+- Full type safety with TypeScript
 
 ### Frontend
 - React 18 with TypeScript

@@ -1,7 +1,7 @@
 import User from "../models/userModel.js";
 import { ErrorHandler } from "../middlewares/errorMiddleware.js";
 import sendVerificationCode from "../utils/sendVerificationCode.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { sendToken } from "../utils/sendToken.js";
 import { catchAsyncErrors } from "../middlewares/errorMiddleware.js";
 import sendEmail from "../utils/sendEmail.js";

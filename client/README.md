@@ -8,8 +8,9 @@ React frontend for the Library Management System, built with Vite.
 - **TypeScript 5.7** - Type safety
 - **Vite 6.0** - Build tool and dev server
 - **Tailwind CSS 3.4** - Utility-first CSS framework
+- **Zustand 5.0** - State management
+- **React Router DOM 7.1** - Routing
 - **Axios** - HTTP client
-- **React Router DOM** - Routing
 - **ESLint** - Code linting
 
 ## Getting Started
@@ -72,10 +73,22 @@ Create a `.env.local` file for additional environment variables:
 VITE_API_URL=http://localhost:5000
 ```
 
+## 📚 Documentation
+
+Comprehensive guides available in the [`docs/`](docs/) folder:
+
+- **[Quick Start](docs/QUICK_START.md)** - Get started quickly with examples
+- **[Zustand Guide](docs/ZUSTAND_GUIDE.md)** - State management patterns
+- **[Router Guide](docs/ROUTER_GUIDE.md)** - React Router usage
+- **[Frontend Structure](docs/FRONTEND_STRUCTURE.md)** - Complete architecture
+- **[Folder Structure](docs/FOLDER_STRUCTURE.md)** - Visual folder organization
+- **[Setup Summary](docs/SETUP_SUMMARY.md)** - What's been configured
+
 ## Development Notes
 
 - The dev server runs on port 3000
-- API proxy is configured in `vite.config.js`
+- API proxy is configured to forward `/api/*` to `http://localhost:5000`
 - Hot Module Replacement (HMR) is enabled for fast refresh
-- ESLint is configured with React-specific rules
+- ESLint is configured with React + TypeScript rules
+- Zustand DevTools integration available
 

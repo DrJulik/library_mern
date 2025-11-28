@@ -16,44 +16,67 @@ Your Library Management System frontend is now fully configured with **React + T
 - ✅ Custom utility classes in `index.css`
 - ✅ Custom color scheme (primary blues)
 
-### 3. **Project Structure**
+### 3. **Project Structure (Feature-Based)**
 ```
 src/
-├── components/          # Reusable components
-│   ├── auth/           # Auth-related components
-│   ├── books/          # Book components
-│   ├── borrow/         # Borrow/return components
-│   ├── common/         # Common UI components (Button, etc.)
-│   │   └── Button.tsx  ✅ Created
-│   ├── layout/         # Layout components (Navbar, Sidebar)
-│   └── users/          # User management components
+├── features/                 # Feature modules
+│   ├── auth/                # Authentication feature
+│   │   ├── components/      # Auth-specific components
+│   │   ├── pages/           # Login, Register, OTP, etc.
+│   │   ├── hooks/           # Auth-specific hooks
+│   │   └── services/        # Auth API calls
+│   │
+│   ├── books/               # Books catalog feature
+│   │   ├── components/      # BookCard, BookList, etc.
+│   │   ├── pages/           # Catalog, Details pages
+│   │   ├── hooks/           # useBooks, useBookSearch
+│   │   └── services/        # Book API calls
+│   │
+│   ├── borrowing/           # Borrowing/returning feature
+│   │   ├── components/      # BorrowCard, History, etc.
+│   │   ├── pages/           # MyBooks, History pages
+│   │   ├── hooks/           # useBorrow, useReturn
+│   │   └── services/        # Borrow API calls
+│   │
+│   ├── admin/               # Admin management feature
+│   │   ├── components/      # Admin-specific components
+│   │   ├── pages/           # Dashboard, Manage pages
+│   │   └── hooks/           # Admin-specific hooks
+│   │
+│   └── user/                # User profile feature
+│       ├── components/      # Profile, Stats components
+│       ├── pages/           # Dashboard, Profile pages
+│       └── hooks/           # User-specific hooks
 │
-├── pages/              # Page components
-│   ├── auth/           # Login, Register, etc.
-│   ├── user/           # User dashboard, books, profile
-│   └── admin/          # Admin dashboard, manage books/users
+├── components/              # Shared structural components
+│   ├── layout/             # Layout, Navbar, Sidebar, Footer
+│   └── ui/                 # Reusable UI components
+│       └── Button.tsx      ✅ Created
 │
-├── context/            # React Context
-│   └── AuthContext.tsx ✅ Created
+├── shared/                  # Shared utilities
+│   ├── api/                # API services
+│   │   ├── api.ts          ✅ Created (Axios instance)
+│   │   ├── authService.ts  ✅ Created
+│   │   ├── bookService.ts  ✅ Created
+│   │   ├── borrowService.ts ✅ Created
+│   │   └── userService.ts  ✅ Created
+│   │
+│   ├── context/            # React Context
+│   │   └── AuthContext.tsx ✅ Created
+│   │
+│   ├── hooks/              # Shared hooks
+│   │   └── useAuth.ts      ✅ Created
+│   │
+│   ├── types/              # TypeScript types
+│   │   └── index.ts        ✅ Created
+│   │
+│   └── utils/              # Utilities
+│       ├── constants.ts    ✅ Created
+│       └── helpers.ts      ✅ Created
 │
-├── hooks/              # Custom hooks
-│   └── useAuth.ts      ✅ Created
+├── router/                  # Routing configuration
 │
-├── services/           # API services
-│   ├── api.ts          ✅ Created (Axios instance)
-│   ├── authService.ts  ✅ Created
-│   ├── bookService.ts  ✅ Created
-│   ├── borrowService.ts ✅ Created
-│   └── userService.ts  ✅ Created
-│
-├── types/              # TypeScript types
-│   └── index.ts        ✅ Created (All interface definitions)
-│
-├── utils/              # Utility functions
-│   ├── constants.ts    ✅ Created
-│   └── helpers.ts      ✅ Created
-│
-└── App.tsx             ✅ Updated with TypeScript
+└── App.tsx                  ✅ Updated with TypeScript
 ```
 
 ### 4. **TypeScript Type Definitions**
@@ -88,20 +111,29 @@ Type-safe constants defined:
 - ✅ API routes
 - ✅ Validation patterns
 
-### 8. **Authentication Context**
-- ✅ `AuthContext` with TypeScript
-- ✅ `useAuth` custom hook
-- ✅ User state management
-- ✅ Login/logout/register methods
+### 8. **State Management with Zustand**
+- ✅ `useAuthStore` - Authentication state (with persistence)
+- ✅ `useUIStore` - UI state (sidebar, toasts, modals, theme)
+- ✅ `useBooksStore` - Books data with search/filters
+- ✅ DevTools integration for debugging
+- ✅ TypeScript support with selectors
 
-### 9. **Dependencies Installed**
+### 9. **React Router Setup**
+- ✅ Route configuration with guards
+- ✅ `ProtectedRoute` - For authenticated users
+- ✅ `AdminRoute` - For admin users only
+- ✅ `PublicRoute` - Redirects authenticated users
+- ✅ 404 and 403 error pages
+
+### 10. **Dependencies Installed**
 ```json
 {
   "dependencies": {
     "axios": "^1.7.9",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.1.1"
+    "react-router-dom": "^7.1.1",
+    "zustand": "^5.0.2"
   },
   "devDependencies": {
     "typescript": "^5.7.2",
@@ -181,20 +213,44 @@ Refer to **`FRONTEND_STRUCTURE.md`** for a complete breakdown of:
 
 ## 📚 Quick Reference
 
-### Using the Auth Context
+### Using Zustand Stores
 ```typescript
-import { useAuth } from '@/hooks/useAuth';
+// Auth Store
+import { useAuthStore, selectUser, selectIsAuthenticated } from '@/stores';
 
 function MyComponent() {
-  const { user, isAuthenticated, isAdmin, login, logout } = useAuth();
+  const user = useAuthStore(selectUser);
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const { login, logout } = useAuthStore();
   
-  // Use auth state and methods
+  const handleLogin = async () => {
+    await login('email@example.com', 'password');
+  };
+}
+
+// UI Store (Toasts, Modals, etc.)
+import { useUIStore } from '@/stores';
+
+function MyComponent() {
+  const { addToast } = useUIStore();
+  
+  const showSuccess = () => {
+    addToast({ type: 'success', message: 'Success!' });
+  };
+}
+
+// Books Store
+import { useBooksStore, selectFilteredBooks } from '@/stores';
+
+function BookList() {
+  const books = useBooksStore(selectFilteredBooks);
+  const { fetchBooks, setSearchQuery } = useBooksStore();
 }
 ```
 
 ### Making API Calls
 ```typescript
-import bookService from '@/services/bookService';
+import bookService from '@/shared/api/bookService';
 
 const fetchBooks = async () => {
   try {
@@ -206,13 +262,25 @@ const fetchBooks = async () => {
 };
 ```
 
-### Using Tailwind Classes
+### Using Shared Components
 ```tsx
+import Button from '@/components/ui/Button';
+import { Book } from '@/shared/types';
+
 <div className="card">
   <Button variant="primary" size="lg">
     Click Me
   </Button>
 </div>
+```
+
+### Feature-Based Structure Example
+```typescript
+// In features/books/pages/BookCatalogPage.tsx
+import BookCard from '../components/BookCard';  // Same feature
+import { useBooks } from '../hooks/useBooks';   // Same feature
+import Button from '@/components/ui/Button';     // Shared component
+import { formatDate } from '@/shared/utils/helpers'; // Shared utility
 ```
 
 ### Custom Tailwind Classes Available:
@@ -258,6 +326,9 @@ All API calls are type-safe! Your editor will provide:
 ## 📖 Documentation
 
 - **FRONTEND_STRUCTURE.md** - Complete component/page breakdown
+- **FOLDER_STRUCTURE.md** - Feature-based folder structure
+- **ZUSTAND_GUIDE.md** - Complete Zustand state management guide
+- **ROUTER_GUIDE.md** - React Router usage and examples
 - **README.md** - Getting started guide
 - **This file** - Setup summary
 

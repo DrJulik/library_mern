@@ -50,12 +50,6 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    avatar: {
-      public_id: {
-        type: String,
-        url: String,
-      },
-    },
     verificationCode: Number,
     verificationCodeExpire: Date,
     resetPasswordToken: String,

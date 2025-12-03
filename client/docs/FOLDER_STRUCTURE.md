@@ -31,7 +31,7 @@ client/src/
 │   │   └── 📂 hooks/              # useAdminStats, useManageBooks
 │   │
 │   └── 📂 user/                   # User profile feature
-│       ├── 📂 components/         # ProfileForm, AvatarUpload, UserStats
+│       ├── 📂 components/         # ProfileForm, UserStats
 │       ├── 📂 pages/              # UserDashboard, ProfilePage
 │       └── 📂 hooks/              # useUserProfile, useUserStats
 │

@@ -6,10 +6,6 @@ export interface User {
   role: 'admin' | 'user';
   accountVerified: boolean;
   borrowedBooks: BorrowedBook[];
-  avatar?: {
-    public_id: string;
-    url: string;
-  };
   createdAt: string;
   updatedAt: string;
 }

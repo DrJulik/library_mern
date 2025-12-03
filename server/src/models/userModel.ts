@@ -52,12 +52,6 @@ const userSchema = new Schema<IUser>(
         },
       },
     ],
-    avatar: {
-      public_id: {
-        type: String,
-      },
-      url: String,
-    },
     verificationCode: Number,
     verificationCodeExpire: Date,
     resetPasswordToken: String,

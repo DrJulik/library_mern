@@ -27,7 +27,7 @@ Based on your backend, here's what the application handles:
 ### User Management
 - Admin can view all users
 - Admin can create new admin accounts
-- Users have avatars and borrowing history
+- Users have borrowing history
 
 ---
 
@@ -118,7 +118,6 @@ src/
 │       ├── components/
 │       │   ├── UserStats.tsx
 │       │   ├── ProfileForm.tsx
-│       │   ├── AvatarUpload.tsx
 │       │   ├── PasswordChangeForm.tsx
 │       │   └── DashboardWidget.tsx
 │       ├── pages/
@@ -301,7 +300,6 @@ User profile and personal dashboard.
 #### Components
 - **UserStats** - User statistics (books borrowed, fines, etc.)
 - **ProfileForm** - Edit profile information
-- **AvatarUpload** - Upload/change avatar
 - **PasswordChangeForm** - Change password
 - **DashboardWidget** - Dashboard cards/widgets
 

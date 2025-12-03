@@ -12,15 +12,15 @@ export class ErrorHandler extends Error {
 }
 
 // Async Error Handler
-type AsyncRequestHandler = (
-  req: Request,
+type AsyncRequestHandler<T = Request> = (
+  req: T,
   res: Response,
   next: NextFunction
 ) => Promise<any>;
 
-export const catchAsyncErrors = (fn: AsyncRequestHandler) => {
-  return (req: Request, res: Response, next: NextFunction) => {
-    Promise.resolve(fn(req, res, next)).catch(next);
+export const catchAsyncErrors = <T = Request>(fn: AsyncRequestHandler<T>) => {
+  return (req: T, res: Response, next: NextFunction) => {
+    Promise.resolve(fn(req as T, res, next)).catch(next);
   };
 };
 

@@ -9,10 +9,6 @@ export const getAllUsers = async (req, res, next) => {
 };
 
 export const registerNewAdmin = catchAsyncErrors(async (req, res, next) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return next(new ErrorHandler("Admin avatar is required", 400));
-  }
-
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -31,27 +27,7 @@ export const registerNewAdmin = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const avatar = req.files.avatar;
-
-  const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
-
-  if (!allowedTypes.includes(avatar.mimetype)) {
-    return next(new ErrorHandler("Invalid file type", 400));
-  }
-
   const hashedPassword = await bcrypt.hash(password, 10);
-
-  const cloudinaryResponse = await cloudinary.uploader.upload(
-    avatar.tempFilePath,
-    {
-      folder: "admin-avatars",
-    }
-  );
-
-  if (!cloudinaryResponse || !cloudinaryResponse.error) {
-    console.error("Cloudinary upload error:", cloudinaryResponse.error);
-    return next(new ErrorHandler("Failed to upload avatar", 400));
-  }
 
   const user = await User.create({
     name,
@@ -59,10 +35,6 @@ export const registerNewAdmin = catchAsyncErrors(async (req, res, next) => {
     password: hashedPassword,
     role: "Admin",
     accountVerified: true,
-    avatar: {
-      public_id: cloudinaryResponse.public_id,
-      url: cloudinaryResponse.secure_url,
-    },
   });
 
   res

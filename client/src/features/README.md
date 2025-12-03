@@ -28,7 +28,6 @@ Borrow and return books
 User profile and dashboard
 - User dashboard with stats
 - Profile management
-- Avatar upload
 - Password change
 
 ### 👑 Admin (`admin/`)

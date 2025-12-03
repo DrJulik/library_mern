@@ -81,7 +81,7 @@ src/
 
 ### 4. **TypeScript Type Definitions**
 All major types defined in `src/types/index.ts`:
-- ✅ `User` - User model with role, borrowed books, avatar
+- ✅ `User` - User model with role, borrowed books
 - ✅ `Book` - Book model with title, author, description, etc.
 - ✅ `BorrowRecord` - Borrow transaction with status, dates, fines
 - ✅ `AuthResponse` - Authentication responses

@@ -54,11 +54,6 @@ library_mern/
    EMAIL_PORT=587
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASSWORD=your_email_password
-   
-   # Cloudinary (for image uploads)
-   CLOUDINARY_CLOUD_NAME=your_cloud_name
-   CLOUDINARY_API_KEY=your_api_key
-   CLOUDINARY_API_SECRET=your_api_secret
    ```
 
 ## 🛠️ Development
@@ -89,7 +84,6 @@ The backend API is built with:
 - **JWT** - Authentication
 - **Bcrypt** - Password hashing
 - **Nodemailer** - Email notifications
-- **Cloudinary** - Image storage
 - **Node-cron** - Scheduled tasks
 
 ### Server Features
@@ -100,7 +94,6 @@ The backend API is built with:
 - Borrowing system with due dates
 - Automated email notifications
 - Scheduled cleanup of unverified accounts
-- File upload support for avatars
 
 ### Server Scripts
 
@@ -157,7 +150,6 @@ The frontend is fully configured with **React + TypeScript + Tailwind CSS**. See
 - JWT for authentication
 - Bcrypt for password hashing
 - Nodemailer for emails
-- Cloudinary for image storage
 - Node-cron for scheduled tasks
 - Full type safety with TypeScript
 

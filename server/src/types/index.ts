@@ -1,4 +1,5 @@
 import { Document, Types } from 'mongoose';
+import { Request } from 'express';
 
 // User Types
 export interface IBorrowedBook {
@@ -9,11 +10,6 @@ export interface IBorrowedBook {
   dueDate: Date;
 }
 
-export interface IAvatar {
-  public_id: string;
-  url: string;
-}
-
 export interface IUser extends Document {
   name: string;
   email: string;
@@ -21,7 +17,6 @@ export interface IUser extends Document {
   role: 'admin' | 'user';
   accountVerified: boolean;
   borrowedBooks: IBorrowedBook[];
-  avatar?: IAvatar;
   verificationCode?: number;
   verificationCodeExpire?: Date;
   resetPasswordToken?: string;
@@ -60,7 +55,7 @@ export interface IBorrow extends Document {
 }
 
 // Request Types
-export interface AuthRequest extends Express.Request {
+export interface AuthRequest extends Request {
   user?: IUser;
 }
 

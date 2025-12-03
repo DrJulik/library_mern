@@ -13,7 +13,6 @@ This is the backend API for the Library Management System, fully built with Type
 - **JWT** - Authentication
 - **Bcrypt** - Password hashing
 - **Nodemailer** - Email service
-- **Cloudinary** - Image storage
 - **Node-cron** - Scheduled tasks
 
 ## 📦 Installation
@@ -48,11 +47,6 @@ SMTP_SERVICE=gmail
 SMTP_PORT=587
 SMTP_MAIL=your_email@gmail.com
 SMTP_PASSWORD=your_app_password
-
-# Cloudinary
-CLOUDINARY_CLIENT_NAME=your_cloud_name
-CLOUDINARY_CLIENT_API=your_api_key
-CLOUDINARY_CLIENT_SECRET=your_api_secret
 ```
 
 ## 🏃 Running the Server

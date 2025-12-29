@@ -1,12 +1,13 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore, selectIsAuthenticated, selectIsLoading } from '@/stores';
+import { useAuthStore, selectIsAuthenticated, selectIsAdmin, selectIsLoading } from '@/store';
 
-interface ProtectedRouteProps {
+interface AdminRouteProps {
   children?: React.ReactNode;
 }
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
+export default function AdminRoute({ children }: AdminRouteProps) {
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const isAdmin = useAuthStore(selectIsAdmin);
   const isLoading = useAuthStore(selectIsLoading);
 
   if (isLoading) {
@@ -19,6 +20,10 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (!isAdmin) {
+    return <Navigate to="/unauthorized" replace />;
   }
 
   return children ? <>{children}</> : <Outlet />;

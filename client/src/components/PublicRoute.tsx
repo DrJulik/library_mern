@@ -1,5 +1,5 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuthStore, selectIsAuthenticated } from '@/stores';
+import { useAuthStore, selectIsAuthenticated } from '@/store';
 
 interface PublicRouteProps {
   children?: React.ReactNode;

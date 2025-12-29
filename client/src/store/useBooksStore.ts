@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
-import bookService from '@/shared/api/bookService';
-import { Book, CreateBookData } from '@/shared/types';
+import bookService from '@/services/bookService';
+import { Book, CreateBookData } from '@/types';
 
 interface BooksState {
   books: Book[];

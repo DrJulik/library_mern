@@ -15,7 +15,7 @@ export const BORROW_STATUS = {
 // Status colors for badges
 export const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
-  borrowed: 'bg-blue-100 text-blue-800',
+  borrowed: 'bg-primary-100 text-primary-800',
   returned: 'bg-gray-100 text-gray-800',
   overdue: 'bg-red-100 text-red-800',
   available: 'bg-green-100 text-green-800',

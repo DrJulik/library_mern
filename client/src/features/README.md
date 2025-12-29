@@ -60,7 +60,7 @@ feature-name/
 
 ```typescript
 // features/books/components/BookCard.tsx
-import { Book } from '@/shared/types';
+import { Book } from '@/types';
 import Button from '@/components/ui/Button';
 
 interface BookCardProps {
@@ -110,8 +110,8 @@ export default function BookCatalogPage() {
 ```typescript
 // features/books/hooks/useBooks.ts
 import { useState, useEffect } from 'react';
-import bookService from '@/shared/api/bookService';
-import { Book } from '@/shared/types';
+import bookService from '@/services/bookService';
+import { Book } from '@/types';
 
 export function useBooks() {
   const [books, setBooks] = useState<Book[]>([]);
@@ -140,7 +140,7 @@ export function useBooks() {
 ## ✅ Best Practices
 
 1. **Keep features independent** - Don't import from other features
-2. **Use shared utilities** - Import from `@/shared/` for common code
+2. **Use shared utilities** - Import from `@/utils/`, `@/services/`, `@/types/` for common code
 3. **Use shared components** - Import from `@/components/` for UI
 4. **Co-locate related code** - Keep feature code together
 5. **Export cleanly** - Use index files if needed
@@ -164,7 +164,7 @@ features/books/utils/formatDate.ts
 ✅ Do use shared utilities:
 ```typescript
 // GOOD
-import { formatDate } from '@/shared/utils/helpers';
+import { formatDate } from '@/utils/helpers';
 ```
 
 ---

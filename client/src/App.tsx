@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import Router from './router';
-import { useAuthStore } from './stores';
+import { useAuthStore } from './store';
 
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
@@ -14,4 +14,3 @@ function App() {
 }
 
 export default App;
-

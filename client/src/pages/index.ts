@@ -2,9 +2,7 @@
 export { default as HomePage } from './HomePage';
 export { default as LoginPage } from './LoginPage';
 export { default as RegisterPage } from './RegisterPage';
-export { default as VerifyOtpPage } from './VerifyOtpPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
-export { default as ResetPasswordPage } from './ResetPasswordPage';
 
 // User pages
 export { default as UserDashboard } from './UserDashboard';
@@ -21,5 +19,4 @@ export { default as CreateAdminPage } from './CreateAdminPage';
 
 // Error pages
 export { default as NotFoundPage } from './NotFoundPage';
-export { default as UnauthorizedPage } from './UnauthorizedPage';
 

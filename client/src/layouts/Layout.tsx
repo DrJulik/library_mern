@@ -23,9 +23,9 @@ export default function Layout({ children }: LayoutProps) {
   }, [pageTitle]);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="h-screen flex flex-col overflow-hidden">
       <Header />
-      <main className="flex-grow">
+      <main className="flex-1 overflow-auto">
         {children}
       </main>
       <Footer />

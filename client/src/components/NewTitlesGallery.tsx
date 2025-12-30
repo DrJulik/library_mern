@@ -6,7 +6,7 @@ interface NewTitlesGalleryProps {
 
 export default function NewTitlesGallery({ books = [] }: NewTitlesGalleryProps) {
   // Placeholder books for now - will be replaced with actual data
-  const placeholderBooks = Array.from({ length: 29 }, (_, i) => ({
+  const placeholderBooks = Array.from({ length: 10 }, (_, i) => ({
     _id: `book-${i}`,
     title: `Book ${i + 1}`,
     author: 'Author Name',
@@ -43,14 +43,14 @@ export default function NewTitlesGallery({ books = [] }: NewTitlesGalleryProps) 
         </div>
         
         {/* Tabs */}
-        <div className="flex gap-4 border-b border-gray-300">
+        {/* <div className="flex gap-4 border-b border-gray-300">
           <button className="px-4 py-2 text-library-600 font-semibold border-b-2 border-library-600">
             Just Arrived
           </button>
           <button className="px-4 py-2 text-gray-600 hover:text-library-600">
             On Order
           </button>
-        </div>
+        </div> */}
       </div>
 
       {/* Filter bar */}
@@ -99,7 +99,7 @@ export default function NewTitlesGallery({ books = [] }: NewTitlesGalleryProps) 
       </div>
 
       {/* Also See section */}
-      <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-gray-300">
+      {/* <div className="grid grid-cols-3 gap-8 mt-12 pt-8 border-t border-gray-300">
         <div>
           <h3 className="font-semibold text-gray-900 mb-3">NON-FICTION</h3>
           <ul className="text-sm text-gray-600 space-y-1">
@@ -158,7 +158,7 @@ export default function NewTitlesGallery({ books = [] }: NewTitlesGalleryProps) 
             <li><a href="#" className="hover:text-library-600">Teen Material</a></li>
           </ul>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 }

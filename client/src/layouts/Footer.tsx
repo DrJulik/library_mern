@@ -15,8 +15,7 @@ export default function Footer() {
       {/* Bottom footer */}
       <div className="bg-gray-200 py-4">
         <div className="container mx-auto px-4 text-sm text-gray-600">
-          <p>Powered by BiblioCommons.</p>
-          <p>BiblioCore: app33 Version 9.33.1 Last updated 2025/12/09 15:45.</p>
+          <p>Powered by black magic. Made by the Gotham City Public Library. Thanks Batman!</p>
         </div>
       </div>
     </footer>

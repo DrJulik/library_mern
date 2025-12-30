@@ -7,7 +7,8 @@ export default function Header() {
       <div className="bg-library-900 text-white py-2">
         <div className="container mx-auto px-4 flex justify-end gap-4 text-sm">
           <a href="#" className="hover:underline">Help</a>
-          <Link to="/login" className="hover:underline">Log In / My B...</Link>
+          {/* TODO: Conditional log in/ username display */}
+          <Link to="/login" className="hover:underline">Log In</Link>
         </div>
       </div>
 
@@ -17,10 +18,7 @@ export default function Header() {
           <div className="flex items-center justify-between gap-4 mb-4">
             {/* Logo */}
             <div className="flex items-center gap-2">
-              <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
-                <span className="text-library-700 font-bold text-2xl">B</span>
-              </div>
-              <span className="text-xl font-semibold">Barrie Public LIBRARY</span>
+              <Link to="/" className="text-xl font-semibold">Gotham City Public Library</Link>
             </div>
 
             {/* Search bar */}
@@ -38,7 +36,6 @@ export default function Header() {
                   Search
                 </button>
               </div>
-              <a href="#" className="text-sm underline mt-1 inline-block">Advanced Search</a>
             </div>
           </div>
         </div>

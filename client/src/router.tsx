@@ -6,9 +6,7 @@ import {
   HomePage,
   LoginPage,
   RegisterPage,
-  VerifyOtpPage,
   ForgotPasswordPage,
-  ResetPasswordPage,
   UserDashboard,
   BookCatalogPage,
   MyBooksPage,
@@ -19,7 +17,6 @@ import {
   BorrowingRecordsPage,
   CreateAdminPage,
   NotFoundPage,
-  UnauthorizedPage,
 } from './pages';
 
 const routes: RouteObject[] = [
@@ -40,16 +37,8 @@ const routes: RouteObject[] = [
         element: <RegisterPage />,
       },
       {
-        path: '/verify-otp',
-        element: <VerifyOtpPage />,
-      },
-      {
         path: '/forgot-password',
         element: <ForgotPasswordPage />,
-      },
-      {
-        path: '/reset-password/:token',
-        element: <ResetPasswordPage />,
       },
     ],
   },
@@ -106,10 +95,6 @@ const routes: RouteObject[] = [
   },
 
   // Error routes
-  {
-    path: '/unauthorized',
-    element: <UnauthorizedPage />,
-  },
   {
     path: '*',
     element: <NotFoundPage />,

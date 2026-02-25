@@ -7,8 +7,11 @@ import {
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
+  VerifyOtpPage,
+  ResetPasswordPage,
   UserDashboard,
   BookCatalogPage,
+  BookDetailPage,
   MyBooksPage,
   ProfilePage,
   AdminDashboard,
@@ -40,6 +43,14 @@ const routes: RouteObject[] = [
         path: '/forgot-password',
         element: <ForgotPasswordPage />,
       },
+      {
+        path: '/verify-otp',
+        element: <VerifyOtpPage />,
+      },
+      {
+        path: '/reset-password/:token',
+        element: <ResetPasswordPage />,
+      },
     ],
   },
 
@@ -54,6 +65,10 @@ const routes: RouteObject[] = [
       {
         path: '/books',
         element: <BookCatalogPage />,
+      },
+      {
+        path: '/books/:id',
+        element: <BookDetailPage />,
       },
       {
         path: '/my-books',

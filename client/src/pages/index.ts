@@ -3,10 +3,13 @@ export { default as HomePage } from './HomePage';
 export { default as LoginPage } from './LoginPage';
 export { default as RegisterPage } from './RegisterPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
+export { default as VerifyOtpPage } from './VerifyOtpPage';
+export { default as ResetPasswordPage } from './ResetPasswordPage';
 
 // User pages
 export { default as UserDashboard } from './UserDashboard';
 export { default as BookCatalogPage } from './BookCatalogPage';
+export { default as BookDetailPage } from './BookDetailPage';
 export { default as MyBooksPage } from './MyBooksPage';
 export { default as ProfilePage } from './ProfilePage';
 

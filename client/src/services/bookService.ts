@@ -1,11 +1,27 @@
 import api from './api';
 import { Book, CreateBookData, BooksResponse } from '../types';
 
+interface SingleBookResponse {
+  success: boolean;
+  book: Book | null;
+}
+
 const bookService = {
   // Get all books
   getAllBooks: async (): Promise<BooksResponse> => {
     const response = await api.get<BooksResponse>('/v1/book/all');
     return response.data;
+  },
+
+  // Get a single book by ID
+  getBookById: async (bookId: string): Promise<SingleBookResponse> => {
+    // Since there's no single book endpoint, we fetch all and filter
+    const response = await api.get<BooksResponse>('/v1/book/all');
+    const book = response.data.books.find(b => b._id === bookId) || null;
+    return {
+      success: !!book,
+      book,
+    };
   },
 
   // Add book (admin only)

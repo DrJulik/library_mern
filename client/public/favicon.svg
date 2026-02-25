@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Bat body -->
+  <ellipse cx="16" cy="20" rx="3" ry="8" fill="#1a1a2e"/>
+  <!-- Bat head -->
+  <circle cx="16" cy="10" r="4" fill="#1a1a2e"/>
+  <!-- Left wing -->
+  <path fill="#16213e" d="M12 12 Q2 14 0 22 Q4 18 8 16 Q10 14 12 12 Z"/>
+  <!-- Right wing -->
+  <path fill="#16213e" d="M20 12 Q30 14 32 22 Q28 18 24 16 Q22 14 20 12 Z"/>
+  <!-- Wing accents (darker) -->
+  <path fill="#0f3460" d="M10 14 Q4 16 2 20 Q5 17 8 15 Z"/>
+  <path fill="#0f3460" d="M22 14 Q28 16 30 20 Q27 17 24 15 Z"/>
+  <!-- Eyes -->
+  <circle cx="14" cy="9" r="1" fill="#e94560"/>
+  <circle cx="18" cy="9" r="1" fill="#e94560"/>
+</svg>

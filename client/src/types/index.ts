@@ -29,6 +29,8 @@ export interface Book {
   available: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Cover image path (e.g. from root public: /images/foo.jpg) */
+  imageLink?: string;
 }
 
 export interface CreateBookData {

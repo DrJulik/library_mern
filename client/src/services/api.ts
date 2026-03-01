@@ -34,11 +34,9 @@ api.interceptors.response.use(
     if (error.response) {
       switch (error.response.status) {
         case 401:
-          // Unauthorized - redirect to login
           console.error('Unauthorized access');
           break;
         case 403:
-          // Forbidden
           console.error('Access forbidden');
           break;
         case 404:

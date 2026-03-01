@@ -55,13 +55,15 @@ export default function BookCard({
 
   const cardContent = (
     <div className={`group flex flex-col ${className}`}>
-      {/* Book Cover */}
-      <div className="relative mb-2">
+      {/* Book Cover - portrait aspect ratio (3:4) */}
+      <div className="relative mb-2 w-full aspect-[3/4] overflow-hidden rounded-sm shadow-md group-hover:shadow-lg transition-shadow duration-200">
         <BookCover
           title={book.title}
           author={book.author}
+          coverUrl={book.imageLink}
           size={coverSize}
-          className="w-full aspect-[3/4] group-hover:shadow-lg transition-shadow duration-200"
+          fillContainer
+          className="absolute inset-0 w-full h-full rounded-sm"
         />
         
         {/* Badge overlay */}

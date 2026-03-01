@@ -1,18 +1,27 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Book } from '@/types';
-import { BookGrid } from '@/components/books';
+import { BookCard } from '@/components/books';
+
+const BOOKS_PER_PAGE = 20;
 
 interface NewTitlesGalleryProps {
   books?: Book[];
   onPlaceHold?: (book: Book) => void;
   loadingBookIds?: string[];
+  loading?: boolean;
+  error?: string | null;
 }
 
-export default function NewTitlesGallery({ 
-  books = [], 
-  onPlaceHold,
-  loadingBookIds = [],
+export default function NewTitlesGallery({
+  books = [],
+  onPlaceHold: _onPlaceHold,
+  loadingBookIds: _loadingBookIds = [],
+  loading = false,
+  error = null,
 }: NewTitlesGalleryProps) {
-  // Placeholder books for now - will be replaced with actual data
+  const [currentPage, setCurrentPage] = useState(1);
+
   const placeholderBooks: Book[] = Array.from({ length: 10 }, (_, i) => ({
     _id: `book-${i}`,
     title: `Book ${i + 1}`,
@@ -26,6 +35,30 @@ export default function NewTitlesGallery({
   }));
 
   const displayBooks = books.length > 0 ? books : placeholderBooks;
+  const totalPages = Math.max(1, Math.ceil(displayBooks.length / BOOKS_PER_PAGE));
+  const startIndex = (currentPage - 1) * BOOKS_PER_PAGE;
+  const paginatedBooks = displayBooks.slice(startIndex, startIndex + BOOKS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [books.length]);
+
+  if (loading && books.length === 0) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex justify-center py-16">
+          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-library-600" />
+        </div>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-center py-16 text-red-600">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -71,18 +104,43 @@ export default function NewTitlesGallery({
       </div>
 
       {/* Book covers grid */}
-      <div className="grid grid-cols-8 gap-4 mb-6">
-        {displayBooks.map((book) => (
-          <div key={book._id} className="cursor-pointer group">
-            <div className="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 rounded overflow-hidden mb-2 group-hover:shadow-lg transition-shadow flex items-center justify-center">
-              <div className="text-center p-2">
-                <div className="text-4xl mb-2">📚</div>
-                <span className="text-xs font-medium text-gray-700 line-clamp-2">{book.title}</span>
-              </div>
-            </div>
-          </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
+        {paginatedBooks.map((book) => (
+          <Link key={book._id} to={`/books/${book._id}`}>
+            <BookCard book={book} showAction={false} linkToDetail={false} />
+          </Link>
         ))}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t border-gray-200">
+          <p className="text-sm text-gray-600">
+            Showing {startIndex + 1}–{Math.min(startIndex + BOOKS_PER_PAGE, displayBooks.length)} of {displayBooks.length} books
+          </p>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Previous
+            </button>
+            <span className="px-3 py-2 text-sm text-gray-600">
+              Page {currentPage} of {totalPages}
+            </span>
+            <button
+              type="button"
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

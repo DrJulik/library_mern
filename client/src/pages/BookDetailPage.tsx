@@ -120,6 +120,7 @@ export default function BookDetailPage() {
                 <BookCover
                   title={book.title}
                   author={book.author}
+                  coverUrl={book.imageLink}
                   size="xl"
                   className="w-64 h-80 lg:w-72 lg:h-96 shadow-2xl"
                 />

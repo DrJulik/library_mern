@@ -10,14 +10,17 @@ import borrowRoutes from "./routes/borrowRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import { notifyUsers } from "./services/notifyUsers.js";
 import { removeUnverifiedAccounts } from "./services/removeUnverifiedAccounts.js";
-dotenv.config({ path: "./.env" });
+import path from "path";
+import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, "../.env") });
 
 const app = express();
 
 // Middleware
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL,
+    origin: process.env.FRONTEND_URL || "http://localhost:3000",
     credentials: true,
   })
 );

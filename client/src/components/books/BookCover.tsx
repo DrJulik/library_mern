@@ -8,6 +8,8 @@ interface BookCoverProps {
   className?: string;
   showOverlay?: boolean;
   overlayContent?: React.ReactNode;
+  /** When true, cover fills its container (e.g. grid cell with aspect ratio) instead of fixed size */
+  fillContainer?: boolean;
 }
 
 // Generate a consistent color based on the book title
@@ -48,24 +50,19 @@ export default function BookCover({
   className = '',
   showOverlay = false,
   overlayContent,
+  fillContainer = false,
 }: BookCoverProps) {
   const colors = useMemo(() => generateBookColor(title), [title]);
   const config = sizeConfig[size];
-  
-  // Get initials from title for the placeholder
-  const initials = title
-    .split(' ')
-    .slice(0, 2)
-    .map(word => word[0]?.toUpperCase() || '')
-    .join('');
+  const wrapperClass = fillContainer ? 'w-full h-full' : config.wrapper;
 
   if (coverUrl) {
     return (
-      <div className={`${config.wrapper} relative rounded-sm overflow-hidden shadow-md ${className}`}>
+      <div className={`${wrapperClass} relative rounded-sm overflow-hidden ${className}`}>
         <img 
           src={coverUrl} 
           alt={`${title} cover`}
-          className="w-full h-full object-cover"
+          className="w-full h-full"
         />
         {showOverlay && overlayContent && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
@@ -78,7 +75,7 @@ export default function BookCover({
 
   return (
     <div 
-      className={`${config.wrapper} relative rounded-sm overflow-hidden shadow-md flex flex-col ${className}`}
+      className={`${wrapperClass} relative rounded-sm overflow-hidden flex flex-col ${className}`}
       style={{
         background: `linear-gradient(135deg, ${colors.from} 0%, ${colors.to} 100%)`,
       }}

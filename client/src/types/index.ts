@@ -46,6 +46,32 @@ export interface CreateBookData {
   description: string;
   price: number;
   quantity: number;
+  genre?: string;
+  language?: string;
+  yearPublished?: number;
+  imageLink?: string;
+  isbn?: string;
+  publisher?: string;
+  pages?: number;
+  subtitle?: string;
+}
+
+/** Shape for bulk upload (matches backend) */
+export interface BulkUploadBook {
+  title: string;
+  author: string;
+  description: string;
+  price: number;
+  quantity: number;
+  genre?: string;
+  language?: string;
+  yearPublished?: number;
+  imageLink?: string;
+  isbn?: string;
+  publisher?: string;
+  pages?: number;
+  slug?: string;
+  subtitle?: string;
 }
 
 // Hold types

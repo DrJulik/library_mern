@@ -209,7 +209,6 @@ export default function NewTitlesGallery({
           <option value="year">Year (newest first)</option>
           <option value="title">Title A–Z</option>
           <option value="author">Author A–Z</option>
-          <option value="price">Price: low–high</option>
         </select>
         <button
           type="button"

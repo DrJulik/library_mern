@@ -14,6 +14,9 @@ interface BookCardProps {
   actionLabel?: string;
   onAction?: (book: Book) => void;
   isActionLoading?: boolean;
+  showDeleteButton?: boolean;
+  onDelete?: (book: Book) => void;
+  isDeleting?: boolean;
   badge?: {
     text: string;
     color: 'red' | 'green' | 'blue' | 'amber' | 'gray';
@@ -40,6 +43,9 @@ export default function BookCard({
   actionLabel = 'Place hold',
   onAction,
   isActionLoading = false,
+  showDeleteButton = false,
+  onDelete,
+  isDeleting = false,
   badge,
   className = '',
   linkTo,
@@ -51,12 +57,38 @@ export default function BookCard({
     onAction?.(book);
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onDelete?.(book);
+  };
+
   const coverSize = variant === 'compact' ? 'sm' : variant === 'detailed' ? 'lg' : 'md';
 
   const cardContent = (
     <div className={`group flex flex-col ${className}`}>
       {/* Book Cover - portrait aspect ratio (3:4) */}
       <div className="relative mb-2 w-full aspect-[3/4] overflow-hidden rounded-sm shadow-md group-hover:shadow-lg transition-shadow duration-200">
+        {showDeleteButton && onDelete && (
+          <button
+            type="button"
+            onClick={handleDelete}
+            disabled={isDeleting}
+            className="absolute top-2 left-2 z-10 p-1.5 rounded bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+            aria-label="Delete book"
+          >
+            {isDeleting ? (
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+            ) : (
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            )}
+          </button>
+        )}
         <BookCover
           title={book.title}
           author={book.author}

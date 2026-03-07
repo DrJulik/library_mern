@@ -17,6 +17,9 @@ interface BookGridProps {
   actionLabel?: string;
   onAction?: (book: Book) => void;
   loadingBookIds?: string[];
+  showDeleteButton?: boolean;
+  onDelete?: (book: Book) => void;
+  deletingBookIds?: string[];
   emptyMessage?: string;
   emptyIcon?: React.ReactNode;
   className?: string;
@@ -46,6 +49,9 @@ export default function BookGrid({
   actionLabel = 'Place hold',
   onAction,
   loadingBookIds = [],
+  showDeleteButton = false,
+  onDelete,
+  deletingBookIds = [],
   emptyMessage = 'No books found',
   emptyIcon,
   className = '',
@@ -172,6 +178,9 @@ export default function BookGrid({
                     actionLabel={actionLabel}
                     onAction={onAction}
                     isActionLoading={loadingBookIds.includes(book._id)}
+                    showDeleteButton={showDeleteButton}
+                    onDelete={onDelete}
+                    isDeleting={deletingBookIds.includes(book._id)}
                     linkTo={`/books/${book._id}`}
                   />
                 </div>
@@ -191,6 +200,9 @@ export default function BookGrid({
                 actionLabel={actionLabel}
                 onAction={onAction}
                 isActionLoading={loadingBookIds.includes(book._id)}
+                showDeleteButton={showDeleteButton}
+                onDelete={onDelete}
+                isDeleting={deletingBookIds.includes(book._id)}
                 linkTo={`/books/${book._id}`}
               />
             ))}

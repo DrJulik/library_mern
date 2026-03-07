@@ -19,6 +19,7 @@ import {
   ProfilePage,
   AdminDashboard,
   ManageBooksPage,
+  BulkUploadPage,
   ManageUsersPage,
   BorrowingRecordsPage,
   ManageHoldsPage,
@@ -109,6 +110,10 @@ const routes: RouteObject[] = [
       {
         path: 'books',
         element: <ManageBooksPage />,
+      },
+      {
+        path: 'books/bulk',
+        element: <BulkUploadPage />,
       },
       {
         path: 'users',

@@ -19,6 +19,7 @@ export { default as ProfilePage } from './ProfilePage';
 // Admin pages
 export { default as AdminDashboard } from './AdminDashboard';
 export { default as ManageBooksPage } from './ManageBooksPage';
+export { default as BulkUploadPage } from './BulkUploadPage';
 export { default as ManageUsersPage } from './ManageUsersPage';
 export { default as BorrowingRecordsPage } from './BorrowingRecordsPage';
 export { default as ManageHoldsPage } from './ManageHoldsPage';

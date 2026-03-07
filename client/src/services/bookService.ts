@@ -36,6 +36,29 @@ const bookService = {
     const response = await api.delete(`/v1/book/delete/${bookId}`);
     return response.data;
   },
+
+  // Bulk upload books (admin only)
+  bulkUploadBooks: async (
+    books: Array<{
+      title: string;
+      author: string;
+      description: string;
+      price: number;
+      quantity: number;
+      genre?: string;
+      language?: string;
+      yearPublished?: number;
+      imageLink?: string;
+      isbn?: string;
+      publisher?: string;
+      pages?: number;
+      slug?: string;
+      subtitle?: string;
+    }>
+  ): Promise<{ success: boolean; message: string; created: number }> => {
+    const response = await api.post('/v1/book/bulk', { books });
+    return response.data;
+  },
 };
 
 export default bookService;

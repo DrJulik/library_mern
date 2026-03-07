@@ -9,7 +9,7 @@ import {
 } from '../controllers/holdController';
 import { isAuthenticated, isAuthorized } from '../middlewares/authMiddleware';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.post('/:bookId', isAuthenticated, placeHold);
 router.get('/my-holds', isAuthenticated, myHolds);

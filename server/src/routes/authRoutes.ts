@@ -11,7 +11,7 @@ import {
 } from '../controllers/authController';
 import { isAuthenticated } from '../middlewares/authMiddleware';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.post('/register', register);
 router.post('/verify-otp', verifyOtp);

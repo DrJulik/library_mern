@@ -2,7 +2,7 @@ import express from 'express';
 import { isAuthenticated, isAuthorized } from '../middlewares/authMiddleware';
 import { addBook, deleteBook, getAllBooks, getBookById, bulkUploadBooks } from '../controllers/bookController';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.post('/add', isAuthenticated, isAuthorized('admin'), addBook);
 router.delete('/delete/:id', isAuthenticated, isAuthorized('admin'), deleteBook);

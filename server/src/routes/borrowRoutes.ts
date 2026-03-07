@@ -7,7 +7,7 @@ import {
 } from '../controllers/borrowController';
 import { isAuthenticated, isAuthorized } from '../middlewares/authMiddleware';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 
 router.get('/my-borrowed-books', isAuthenticated, borrowedBooks);
 router.get(

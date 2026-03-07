@@ -3,12 +3,27 @@ import { Link } from 'react-router-dom';
 import Layout from '@/layouts/Layout';
 import { useAuthStore } from '@/store/useAuthStore';
 import borrowService from '@/services/borrowService';
-import { BorrowRecord, Book } from '@/types';
+import { BorrowedBook, Book } from '@/types';
 import { BookGrid, BookList } from '@/components/books';
+
+/** Build minimal Book from BorrowedBook for display (API returns bookId, bookTitle, not full Book) */
+function toDisplayBook(b: BorrowedBook): Book {
+  return {
+    _id: b.bookId,
+    title: b.bookTitle,
+    author: '',
+    description: '',
+    price: 0,
+    quantity: 1,
+    available: false,
+    createdAt: b.borrowedDate,
+    updatedAt: b.borrowedDate,
+  };
+}
 
 export default function UserDashboard() {
   const { user } = useAuthStore();
-  const [borrowedBooks, setBorrowedBooks] = useState<BorrowRecord[]>([]);
+  const [borrowedBooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -28,35 +43,30 @@ export default function UserDashboard() {
     fetchBorrowedBooks();
   }, []);
 
-  // Calculate stats
-  const checkedOut = borrowedBooks.filter(b => b.status === 'borrowed').length;
-  const overdue = borrowedBooks.filter(b => b.status === 'overdue').length;
-  const returned = borrowedBooks.filter(b => b.status === 'returned').length;
-  const totalFines = borrowedBooks.reduce((acc, b) => acc + (b.fine || 0), 0);
+  // API returns BorrowedBook[] with { bookId, returned, bookTitle, borrowedDate, dueDate }
+  const now = new Date();
+  const checkedOut = borrowedBooks.filter((b) => !b.returned).length;
+  const overdue = borrowedBooks.filter((b) => !b.returned && new Date(b.dueDate) < now).length;
+  const returned = borrowedBooks.filter((b) => b.returned).length;
+  const totalFines = 0; // API doesn't return fine data in user.borrowedBooks
 
   // Get recent activity (last 5 transactions)
   const recentActivity = [...borrowedBooks]
     .sort((a, b) => new Date(b.borrowedDate).getTime() - new Date(a.borrowedDate).getTime())
     .slice(0, 5);
 
-  // Currently borrowed books - convert to Book array
-  const currentlyBorrowedRecords = borrowedBooks.filter(b => b.status === 'borrowed' || b.status === 'overdue');
-  const currentlyBorrowedBooks: Book[] = currentlyBorrowedRecords
-    .map(record => record.book as Book)
-    .filter(Boolean);
+  // Currently borrowed - not returned
+  const currentlyBorrowedRecords = borrowedBooks.filter((b) => !b.returned);
+  const currentlyBorrowedBooks: Book[] = currentlyBorrowedRecords.map(toDisplayBook);
 
   // Convert activity to BookList format
-  const activityItems = recentActivity.map((record) => {
-    const book = record.book as Book;
-    const isReturned = record.status === 'returned';
-    return {
-      book,
-      type: (isReturned ? 'returned' : 'borrowed') as 'returned' | 'borrowed',
-      date: record.borrowedDate,
-      dueDate: record.dueDate,
-      isOverdue: record.status === 'overdue',
-    };
-  }).filter(item => item.book);
+  const activityItems = recentActivity.map((record) => ({
+    book: toDisplayBook(record),
+    type: (record.returned ? 'returned' : 'borrowed') as 'returned' | 'borrowed',
+    date: record.borrowedDate,
+    dueDate: record.dueDate,
+    isOverdue: !record.returned && new Date(record.dueDate) < now,
+  }));
 
   return (
     <Layout>

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Layout from '@/layouts/Layout';
 import holdService from '@/services/holdService';
+import borrowService from '@/services/borrowService';
 import { Hold, HoldStatus } from '@/types';
 import { getApiErrorMessage } from '@/services/api';
 
@@ -51,6 +52,36 @@ export default function ManageHoldsPage() {
     setError(null);
     try {
       await holdService.rejectHold(holdId);
+      await fetchHolds();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRecordPickup = async (h: Hold) => {
+    const bookId = typeof h.book === 'object' && h.book ? (h.book as { _id?: string })._id : (h.book as string);
+    const email = userEmail(h);
+    if (!bookId || !email || email === '—') return;
+
+    setActionLoading(h._id);
+    setError(null);
+    try {
+      await borrowService.recordBorrowedBook(bookId, email);
+      await fetchHolds();
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRelease = async (holdId: string) => {
+    setActionLoading(holdId);
+    setError(null);
+    try {
+      await holdService.releaseHold(holdId);
       await fetchHolds();
     } catch (err) {
       setError(getApiErrorMessage(err));
@@ -179,6 +210,25 @@ export default function ManageHoldsPage() {
                             className="px-3 py-1.5 bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50 text-sm font-medium"
                           >
                             Reject
+                          </button>
+                        </>
+                      ) : h.status === 'approved' ? (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleRecordPickup(h)}
+                            disabled={actionLoading === h._id}
+                            className="px-3 py-1.5 bg-library-600 text-white rounded hover:bg-library-700 disabled:opacity-50 text-sm font-medium"
+                          >
+                            {actionLoading === h._id ? '…' : 'Record pickup'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleRelease(h._id)}
+                            disabled={actionLoading === h._id}
+                            className="px-3 py-1.5 bg-amber-600 text-white rounded hover:bg-amber-700 disabled:opacity-50 text-sm font-medium"
+                          >
+                            Release (no pickup)
                           </button>
                         </>
                       ) : (

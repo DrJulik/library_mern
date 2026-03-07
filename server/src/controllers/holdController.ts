@@ -150,3 +150,34 @@ export const rejectHold = catchAsyncErrors(
     });
   }
 );
+
+export const releaseHold = catchAsyncErrors(
+  async (req: AuthRequest, res: Response, next: NextFunction) => {
+    const { holdId } = req.params;
+
+    const hold = await Hold.findById(holdId);
+    if (!hold) {
+      return next(new ErrorHandler('Hold not found', 404));
+    }
+    if (hold.status !== 'approved') {
+      return next(new ErrorHandler('Only approved holds can be released (no pickup)', 400));
+    }
+
+    const book = await Book.findById(hold.book);
+    if (!book) {
+      return next(new ErrorHandler('Book not found', 404));
+    }
+
+    book.quantity += 1;
+    book.available = book.quantity > 0;
+    await book.save();
+
+    hold.status = 'cancelled';
+    await hold.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Hold released; book returned to availability',
+    });
+  }
+);

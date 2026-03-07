@@ -5,6 +5,7 @@ import {
   getAllHolds,
   approveHold,
   rejectHold,
+  releaseHold,
 } from '../controllers/holdController';
 import { isAuthenticated, isAuthorized } from '../middlewares/authMiddleware';
 
@@ -30,6 +31,12 @@ router.patch(
   isAuthenticated,
   isAuthorized('admin'),
   rejectHold
+);
+router.patch(
+  '/:holdId/release',
+  isAuthenticated,
+  isAuthorized('admin'),
+  releaseHold
 );
 
 export default router;

@@ -33,6 +33,11 @@ const holdService = {
     const response = await api.patch<HoldActionResponse>(`/v1/hold/${holdId}/reject`);
     return response.data;
   },
+
+  releaseHold: async (holdId: string): Promise<HoldActionResponse> => {
+    const response = await api.patch<HoldActionResponse>(`/v1/hold/${holdId}/release`);
+    return response.data;
+  },
 };
 
 export default holdService;

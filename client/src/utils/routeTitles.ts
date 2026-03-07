@@ -4,6 +4,9 @@
  */
 export const routeTitles: Record<string, string> = {
   '/': 'Home',
+  '/privacy': 'Privacy Statement',
+  '/terms': 'Terms of Use',
+  '/accessibility': 'Accessibility Statement',
   '/login': 'Login',
   '/register': 'Register',
   '/verify-otp': 'Verify OTP',
@@ -34,6 +37,9 @@ export function getPageTitle(pathname: string): string {
   // Handle dynamic routes
   if (pathname.startsWith('/reset-password/')) {
     return 'Reset Password';
+  }
+  if (pathname.startsWith('/books/') && pathname.length > 7) {
+    return 'Book Details';
   }
 
   // Default to 404 if no match found (for catch-all routes)

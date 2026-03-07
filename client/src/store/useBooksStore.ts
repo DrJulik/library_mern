@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { getApiErrorMessage } from '@/services/api';
 import bookService from '@/services/bookService';
 import { Book, CreateBookData } from '@/types';
 
@@ -12,6 +13,8 @@ interface BooksState {
   filters: {
     available?: boolean;
     author?: string;
+    genre?: string;
+    language?: string;
   };
 }
 
@@ -29,7 +32,7 @@ type BooksStore = BooksState & BooksActions;
 
 export const useBooksStore = create<BooksStore>()(
   devtools(
-    (set, get) => ({
+    (set) => ({
       // Initial state
       books: [],
       selectedBook: null,
@@ -47,9 +50,9 @@ export const useBooksStore = create<BooksStore>()(
           if (response.success) {
             set({ books: response.books, isLoading: false });
           }
-        } catch (error: any) {
+        } catch (error) {
           set({
-            error: error.response?.data?.message || 'Failed to fetch books',
+            error: getApiErrorMessage(error) || 'Failed to fetch books',
             isLoading: false,
           });
         }
@@ -66,9 +69,9 @@ export const useBooksStore = create<BooksStore>()(
               isLoading: false,
             }));
           }
-        } catch (error: any) {
+        } catch (error) {
           set({
-            error: error.response?.data?.message || 'Failed to add book',
+            error: getApiErrorMessage(error) || 'Failed to add book',
             isLoading: false,
           });
           throw error;
@@ -84,9 +87,9 @@ export const useBooksStore = create<BooksStore>()(
             books: state.books.filter((book) => book._id !== bookId),
             isLoading: false,
           }));
-        } catch (error: any) {
+        } catch (error) {
           set({
-            error: error.response?.data?.message || 'Failed to delete book',
+            error: getApiErrorMessage(error) || 'Failed to delete book',
             isLoading: false,
           });
           throw error;
@@ -138,4 +141,12 @@ export const selectFilteredBooks = (state: BooksStore) => {
 export const selectSelectedBook = (state: BooksStore) => state.selectedBook;
 export const selectBooksLoading = (state: BooksStore) => state.isLoading;
 export const selectBooksError = (state: BooksStore) => state.error;
+export const selectSearchQuery = (state: BooksStore) => state.searchQuery;
+export const selectFilters = (state: BooksStore) => state.filters;
+
+/** Unique authors from all books, sorted, for filter dropdowns */
+export const selectUniqueAuthors = (state: BooksStore) => {
+  const authors = new Set(state.books.map((b) => b.author).filter(Boolean));
+  return Array.from(authors).sort((a, b) => a.localeCompare(b));
+};
 

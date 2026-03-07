@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { getApiErrorMessage } from '@/services/api';
 import authService from '@/services/authService';
 import { User, RegisterData } from '@/types';
 
@@ -24,7 +25,7 @@ type AuthStore = AuthState & AuthActions;
 export const useAuthStore = create<AuthStore>()(
   devtools(
     persist(
-      (set, get) => ({
+      (set) => ({
         // Initial state
         user: null,
         isAuthenticated: false,
@@ -45,9 +46,9 @@ export const useAuthStore = create<AuthStore>()(
                 error: null,
               });
             }
-          } catch (error: any) {
+          } catch (error) {
             set({
-              error: error.response?.data?.message || 'Login failed',
+              error: getApiErrorMessage(error) || 'Login failed',
               isLoading: false,
             });
             throw error;
@@ -62,9 +63,9 @@ export const useAuthStore = create<AuthStore>()(
             if (response.success) {
               set({ isLoading: false, error: null });
             }
-          } catch (error: any) {
+          } catch (error) {
             set({
-              error: error.response?.data?.message || 'Registration failed',
+              error: getApiErrorMessage(error) || 'Registration failed',
               isLoading: false,
             });
             throw error;

@@ -1,5 +1,8 @@
 // Public pages
 export { default as HomePage } from './HomePage';
+export { default as PrivacyStatementPage } from './PrivacyStatementPage';
+export { default as TermsOfUsePage } from './TermsOfUsePage';
+export { default as AccessibilityStatementPage } from './AccessibilityStatementPage';
 export { default as LoginPage } from './LoginPage';
 export { default as RegisterPage } from './RegisterPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';
@@ -18,6 +21,7 @@ export { default as AdminDashboard } from './AdminDashboard';
 export { default as ManageBooksPage } from './ManageBooksPage';
 export { default as ManageUsersPage } from './ManageUsersPage';
 export { default as BorrowingRecordsPage } from './BorrowingRecordsPage';
+export { default as ManageHoldsPage } from './ManageHoldsPage';
 export { default as CreateAdminPage } from './CreateAdminPage';
 
 // Error pages

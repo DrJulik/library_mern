@@ -27,10 +27,17 @@ export interface Book {
   price: number;
   quantity: number;
   available: boolean;
+  genre?: string;
+  language?: string;
+  yearPublished?: number;
+  imageLink?: string;
+  isbn?: string;
+  publisher?: string;
+  pages?: number;
+  slug?: string;
+  subtitle?: string;
   createdAt: string;
   updatedAt: string;
-  /** Cover image path (e.g. from root public: /images/foo.jpg) */
-  imageLink?: string;
 }
 
 export interface CreateBookData {
@@ -39,6 +46,28 @@ export interface CreateBookData {
   description: string;
   price: number;
   quantity: number;
+}
+
+// Hold types
+export type HoldStatus = 'pending' | 'approved' | 'fulfilled' | 'cancelled';
+
+export interface Hold {
+  _id: string;
+  user: string | User;
+  book: string | Book;
+  status: HoldStatus;
+  createdAt: string;
+}
+
+export interface HoldListResponse {
+  success: boolean;
+  holds: Hold[];
+}
+
+export interface PlaceHoldResponse {
+  success: boolean;
+  message: string;
+  hold?: Hold;
 }
 
 // Borrow types

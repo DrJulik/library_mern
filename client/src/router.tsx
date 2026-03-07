@@ -4,6 +4,9 @@ import AdminRoute from './components/AdminRoute';
 import PublicRoute from './components/PublicRoute';
 import {
   HomePage,
+  PrivacyStatementPage,
+  TermsOfUsePage,
+  AccessibilityStatementPage,
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
@@ -18,15 +21,36 @@ import {
   ManageBooksPage,
   ManageUsersPage,
   BorrowingRecordsPage,
+  ManageHoldsPage,
   CreateAdminPage,
   NotFoundPage,
 } from './pages';
 
 const routes: RouteObject[] = [
-  // Public routes
+  // Public routes (no auth required)
   {
     path: '/',
     element: <HomePage />,
+  },
+  {
+    path: '/books',
+    element: <BookCatalogPage />,
+  },
+  {
+    path: '/books/:id',
+    element: <BookDetailPage />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyStatementPage />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfUsePage />,
+  },
+  {
+    path: '/accessibility',
+    element: <AccessibilityStatementPage />,
   },
   {
     element: <PublicRoute />,
@@ -63,14 +87,6 @@ const routes: RouteObject[] = [
         element: <UserDashboard />,
       },
       {
-        path: '/books',
-        element: <BookCatalogPage />,
-      },
-      {
-        path: '/books/:id',
-        element: <BookDetailPage />,
-      },
-      {
         path: '/my-books',
         element: <MyBooksPage />,
       },
@@ -101,6 +117,10 @@ const routes: RouteObject[] = [
       {
         path: 'borrowing',
         element: <BorrowingRecordsPage />,
+      },
+      {
+        path: 'holds',
+        element: <ManageHoldsPage />,
       },
       {
         path: 'create-admin',

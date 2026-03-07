@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 interface BookCoverProps {
   title: string;
@@ -55,14 +55,17 @@ export default function BookCover({
   const colors = useMemo(() => generateBookColor(title), [title]);
   const config = sizeConfig[size];
   const wrapperClass = fillContainer ? 'w-full h-full' : config.wrapper;
+  const [imageFailed, setImageFailed] = useState(false);
+  useEffect(() => setImageFailed(false), [coverUrl]);
 
-  if (coverUrl) {
+  if (coverUrl && !imageFailed) {
     return (
       <div className={`${wrapperClass} relative rounded-sm overflow-hidden ${className}`}>
-        <img 
-          src={coverUrl} 
+        <img
+          src={coverUrl}
           alt={`${title} cover`}
-          className="w-full h-full"
+          className="w-full h-full object-cover"
+          onError={() => setImageFailed(true)}
         />
         {showOverlay && overlayContent && (
           <div className="absolute inset-0 bg-black/50 flex items-center justify-center">

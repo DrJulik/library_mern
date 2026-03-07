@@ -24,14 +24,30 @@ api.interceptors.request.use(
   }
 );
 
+/**
+ * Extract the backend error message from an axios error for display to the user.
+ * Backend sends { success: false, message: string } on error.
+ */
+export function getApiErrorMessage(error: unknown): string {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const err = error as { response?: { data?: { message?: string } } };
+    const message = err.response?.data?.message;
+    if (typeof message === 'string' && message) return message;
+  }
+  return 'An error occurred. Please try again.';
+}
+
 // Response interceptor
 api.interceptors.response.use(
   (response: AxiosResponse) => {
     return response;
   },
   (error: AxiosError) => {
-    // Handle common errors
-    if (error.response) {
+    // Log the actual backend message when present
+    if (error.response?.data && typeof error.response.data === 'object' && 'message' in error.response.data) {
+      const message = (error.response.data as { message?: string }).message;
+      if (message) console.error(message);
+    } else if (error.response) {
       switch (error.response.status) {
         case 401:
           console.error('Unauthorized access');

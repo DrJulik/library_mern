@@ -1,9 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Book } from '@/types';
 import { BookCard } from '@/components/books';
 
 const BOOKS_PER_PAGE = 20;
+
+type AvailabilityFilter = '' | 'available' | 'unavailable';
+type SortOption = 'newest' | 'title' | 'author' | 'price' | 'year';
 
 interface NewTitlesGalleryProps {
   books?: Book[];
@@ -21,6 +24,11 @@ export default function NewTitlesGallery({
   error = null,
 }: NewTitlesGalleryProps) {
   const [currentPage, setCurrentPage] = useState(1);
+  const [authorFilter, setAuthorFilter] = useState('');
+  const [genreFilter, setGenreFilter] = useState('');
+  const [languageFilter, setLanguageFilter] = useState('');
+  const [availabilityFilter, setAvailabilityFilter] = useState<AvailabilityFilter>('');
+  const [sortBy, setSortBy] = useState<SortOption>('newest');
 
   const placeholderBooks: Book[] = Array.from({ length: 10 }, (_, i) => ({
     _id: `book-${i}`,
@@ -34,14 +42,70 @@ export default function NewTitlesGallery({
     updatedAt: new Date().toISOString(),
   }));
 
-  const displayBooks = books.length > 0 ? books : placeholderBooks;
+  const sourceBooks = books.length > 0 ? books : placeholderBooks;
+
+  const uniqueAuthors = useMemo(() => {
+    const authors = new Set(sourceBooks.map((b) => b.author.trim()).filter(Boolean));
+    return Array.from(authors).sort((a, b) => a.localeCompare(b));
+  }, [sourceBooks]);
+
+  const uniqueGenres = useMemo(() => {
+    const genres = new Set(sourceBooks.map((b) => b.genre?.trim()).filter(Boolean) as string[]);
+    return Array.from(genres).sort((a, b) => a.localeCompare(b));
+  }, [sourceBooks]);
+
+  const uniqueLanguages = useMemo(() => {
+    const langs = new Set(sourceBooks.map((b) => b.language?.trim()).filter(Boolean) as string[]);
+    return Array.from(langs).sort((a, b) => a.localeCompare(b));
+  }, [sourceBooks]);
+
+  const filteredAndSortedBooks = useMemo(() => {
+    let list = [...sourceBooks];
+    if (authorFilter) {
+      list = list.filter((b) => b.author.trim() === authorFilter);
+    }
+    if (genreFilter) {
+      list = list.filter((b) => b.genre?.trim() === genreFilter);
+    }
+    if (languageFilter) {
+      list = list.filter((b) => b.language?.trim() === languageFilter);
+    }
+    if (availabilityFilter === 'available') {
+      list = list.filter((b) => b.available);
+    } else if (availabilityFilter === 'unavailable') {
+      list = list.filter((b) => !b.available);
+    }
+    if (sortBy === 'newest') {
+      list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (sortBy === 'year') {
+      list.sort((a, b) => (b.yearPublished ?? 0) - (a.yearPublished ?? 0));
+    } else if (sortBy === 'title') {
+      list.sort((a, b) => a.title.localeCompare(b.title));
+    } else if (sortBy === 'author') {
+      list.sort((a, b) => a.author.localeCompare(b.author) || a.title.localeCompare(b.title));
+    } else if (sortBy === 'price') {
+      list.sort((a, b) => a.price - b.price);
+    }
+    return list;
+  }, [sourceBooks, authorFilter, genreFilter, languageFilter, availabilityFilter, sortBy]);
+
+  const displayBooks = filteredAndSortedBooks;
   const totalPages = Math.max(1, Math.ceil(displayBooks.length / BOOKS_PER_PAGE));
   const startIndex = (currentPage - 1) * BOOKS_PER_PAGE;
   const paginatedBooks = displayBooks.slice(startIndex, startIndex + BOOKS_PER_PAGE);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [books.length]);
+  }, [books.length, authorFilter, genreFilter, languageFilter, availabilityFilter, sortBy]);
+
+  const handleClearFilters = () => {
+    setAuthorFilter('');
+    setGenreFilter('');
+    setLanguageFilter('');
+    setAvailabilityFilter('');
+    setSortBy('newest');
+    setCurrentPage(1);
+  };
 
   if (loading && books.length === 0) {
     return (
@@ -62,7 +126,7 @@ export default function NewTitlesGallery({
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Breadcrumb and sub-navigation */}
+      {/* Breadcrumb and sub-navigation
       <div className="flex justify-between items-center mb-6">
         <div className="text-gray-600">Explore the Catalogue</div>
         <div className="flex gap-4 text-sm">
@@ -73,7 +137,7 @@ export default function NewTitlesGallery({
           <a href="#" className="text-gray-600 hover:text-library-600">Staff Picks</a>
           <a href="#" className="text-gray-600 hover:text-library-600">Featured Languages</a>
         </div>
-      </div>
+      </div> */}
 
       {/* Page title */}
       <div className="mb-6">
@@ -84,22 +148,75 @@ export default function NewTitlesGallery({
       </div>
 
       {/* Filter bar */}
-      <div className="mb-6 flex items-center gap-4 p-4 bg-gray-100 rounded">
+      <div className="mb-6 flex flex-wrap items-center gap-4 p-4 bg-gray-100 rounded">
         <span className="font-medium">Filter by</span>
-        <select className="px-4 py-2 border border-gray-300 rounded bg-white">
-          <option>Nothing selected</option>
+        <select
+          value={authorFilter}
+          onChange={(e) => setAuthorFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded bg-white"
+          aria-label="Filter by author"
+        >
+          <option value="">All authors</option>
+          {uniqueAuthors.map((author) => (
+            <option key={author} value={author}>
+              {author}
+            </option>
+          ))}
         </select>
-        <select className="px-4 py-2 border border-gray-300 rounded bg-white">
-          <option>Nothing selected</option>
+        <select
+          value={genreFilter}
+          onChange={(e) => setGenreFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded bg-white"
+          aria-label="Filter by genre"
+        >
+          <option value="">All genres</option>
+          {uniqueGenres.map((genre) => (
+            <option key={genre} value={genre}>
+              {genre}
+            </option>
+          ))}
         </select>
-        <select className="px-4 py-2 border border-gray-300 rounded bg-white">
-          <option>Nothing selected</option>
+        <select
+          value={languageFilter}
+          onChange={(e) => setLanguageFilter(e.target.value)}
+          className="px-4 py-2 border border-gray-300 rounded bg-white"
+          aria-label="Filter by language"
+        >
+          <option value="">All languages</option>
+          {uniqueLanguages.map((lang) => (
+            <option key={lang} value={lang}>
+              {lang}
+            </option>
+          ))}
         </select>
-        <select className="px-4 py-2 border border-gray-300 rounded bg-white">
-          <option>Nothing selected</option>
+        <select
+          value={availabilityFilter}
+          onChange={(e) => setAvailabilityFilter(e.target.value as AvailabilityFilter)}
+          className="px-4 py-2 border border-gray-300 rounded bg-white"
+          aria-label="Filter by availability"
+        >
+          <option value="">All</option>
+          <option value="available">Available</option>
+          <option value="unavailable">Checked out</option>
         </select>
-        <button className="ml-auto px-6 py-2 bg-library-900 text-white rounded hover:bg-library-800">
-          Apply
+        <select
+          value={sortBy}
+          onChange={(e) => setSortBy(e.target.value as SortOption)}
+          className="px-4 py-2 border border-gray-300 rounded bg-white"
+          aria-label="Sort by"
+        >
+          <option value="newest">Newest first</option>
+          <option value="year">Year (newest first)</option>
+          <option value="title">Title A–Z</option>
+          <option value="author">Author A–Z</option>
+          <option value="price">Price: low–high</option>
+        </select>
+        <button
+          type="button"
+          onClick={handleClearFilters}
+          className="ml-auto px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50"
+        >
+          Clear filters
         </button>
       </div>
 

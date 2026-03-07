@@ -25,15 +25,15 @@ const borrowService = {
     return response.data;
   },
 
-  // Record borrowed book (admin only)
-  recordBorrowedBook: async (bookId: string, userId: string): Promise<BorrowActionResponse> => {
-    const response = await api.post<BorrowActionResponse>(`/v1/borrow/record-borrowed-book/${bookId}`, { userId });
+  // Record borrowed book (admin only) - backend expects user email in body
+  recordBorrowedBook: async (bookId: string, email: string): Promise<BorrowActionResponse> => {
+    const response = await api.post<BorrowActionResponse>(`/v1/borrow/record-borrowed-book/${bookId}`, { email });
     return response.data;
   },
 
-  // Record returned book (admin only)
-  recordReturnedBook: async (bookId: string, userId: string): Promise<BorrowActionResponse> => {
-    const response = await api.post<BorrowActionResponse>(`/v1/borrow/record-returned-book/${bookId}`, { userId });
+  // Record returned book (admin only) - backend expects user email in body
+  recordReturnedBook: async (bookId: string, email: string): Promise<BorrowActionResponse> => {
+    const response = await api.post<BorrowActionResponse>(`/v1/borrow/record-returned-book/${bookId}`, { email });
     return response.data;
   },
 };

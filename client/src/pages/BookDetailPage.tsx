@@ -1,18 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Layout from '@/layouts/Layout';
-import { Book } from '@/types';
+import { Book, Hold } from '@/types';
 import bookService from '@/services/bookService';
+import holdService from '@/services/holdService';
 import BookCover from '@/components/books/BookCover';
 import StarRating from '@/components/books/StarRating';
+import { useAuthStore, selectIsAuthenticated } from '@/store/useAuthStore';
+import { getApiErrorMessage } from '@/services/api';
 
 export default function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const isAuthenticated = useAuthStore(selectIsAuthenticated);
   const [book, setBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [holdForBook, setHoldForBook] = useState<Hold | null>(null);
+  const [holdMessage, setHoldMessage] = useState<string | null>(null);
+  const [holdError, setHoldError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -37,14 +44,52 @@ export default function BookDetailPage() {
     fetchBook();
   }, [id]);
 
+  useEffect(() => {
+    if (book?.title) {
+      document.title = `${book.title} - Gotham City Public Library`;
+    }
+    return () => {
+      document.title = 'Gotham City Public Library';
+    };
+  }, [book?.title]);
+
+  useEffect(() => {
+    if (!book || !isAuthenticated) {
+      setHoldForBook(null);
+      return;
+    }
+    const fetchMyHolds = async () => {
+      try {
+        const res = await holdService.getMyHolds();
+        const myHold = res.holds?.find(
+          (h) => (typeof h.book === 'object' && h.book._id === book._id) || (typeof h.book === 'string' && h.book === book._id)
+        );
+        setHoldForBook(myHold ?? null);
+      } catch {
+        setHoldForBook(null);
+      }
+    };
+    fetchMyHolds();
+  }, [book?._id, isAuthenticated]);
+
   const handlePlaceHold = async () => {
     if (!book) return;
     setIsActionLoading(true);
-    // TODO: Implement place hold functionality when borrow service supports it
-    setTimeout(() => {
+    setHoldError(null);
+    setHoldMessage(null);
+    try {
+      const res = await holdService.placeHold(book._id);
+      setHoldMessage(res.message || 'Hold placed; pending admin approval.');
+      const res2 = await holdService.getMyHolds();
+      const myHold = res2.holds?.find(
+        (h) => (typeof h.book === 'object' && h.book._id === book._id) || (typeof h.book === 'string' && h.book === book._id)
+      );
+      setHoldForBook(myHold ?? null);
+    } catch (err) {
+      setHoldError(getApiErrorMessage(err));
+    } finally {
       setIsActionLoading(false);
-      // Show success message or handle the action
-    }, 1000);
+    }
   };
 
   if (isLoading) {
@@ -116,13 +161,13 @@ export default function BookDetailPage() {
           <div className="grid lg:grid-cols-[320px_1fr] gap-8 lg:gap-12">
             {/* Left Column - Book Cover */}
             <div className="flex flex-col items-center lg:items-start">
-              <div className="relative group">
+              <div className="relative w-full group">
                 <BookCover
                   title={book.title}
                   author={book.author}
                   coverUrl={book.imageLink}
                   size="xl"
-                  className="w-64 h-80 lg:w-72 lg:h-96 shadow-2xl"
+                  className="!w-full lg:w-72 lg:h-96 shadow-2xl"
                 />
                 
                 {/* Availability Badge */}
@@ -151,48 +196,78 @@ export default function BookDetailPage() {
               </div>
 
               {/* Quick Stats */}
-              <div className="flex items-center gap-6 mt-8 text-white/70">
+              <div className="flex items-center gap-6 mt-8 text-white/70 w-full justify-center">
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white">{book.quantity}</div>
                   <div className="text-xs uppercase tracking-wide">Copies</div>
                 </div>
-                <div className="w-px h-10 bg-white/20"></div>
-                <div className="text-center">
+                {/* <div className="w-px h-10 bg-white/20"></div> */}
+                {/* <div className="text-center">
                   <div className="text-2xl font-bold text-library-accent">${book.price.toFixed(2)}</div>
                   <div className="text-xs uppercase tracking-wide">Value</div>
-                </div>
+                </div> */}
               </div>
+
+              {/* Hold message / error */}
+              {holdMessage && (
+                <p className="w-full mt-2 text-sm text-emerald-400">{holdMessage}</p>
+              )}
+              {holdError && (
+                <p className="w-full mt-2 text-sm text-red-400">{holdError}</p>
+              )}
 
               {/* Action Buttons */}
               <div className="w-full mt-8 space-y-3">
-                <button
-                  onClick={handlePlaceHold}
-                  disabled={!book.available || isActionLoading}
-                  className={`w-full py-3.5 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2
-                    ${book.available 
-                      ? 'bg-library-accent hover:bg-library-accent/90 shadow-lg shadow-library-accent/30 hover:shadow-xl hover:shadow-library-accent/40' 
-                      : 'bg-white/10 cursor-not-allowed'
+                {isAuthenticated ? (
+                  <button
+                    onClick={handlePlaceHold}
+                    disabled={
+                      !book.available ||
+                      isActionLoading ||
+                      !!(holdForBook && (holdForBook.status === 'pending' || holdForBook.status === 'approved'))
                     }
-                    ${isActionLoading ? 'opacity-70 cursor-wait' : ''}
-                  `}
-                >
-                  {isActionLoading ? (
-                    <>
-                      <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      {book.available ? 'Place Hold' : 'Join Waitlist'}
-                    </>
-                  )}
-                </button>
+                    className={`w-full py-3.5 rounded-lg font-semibold text-white transition-all flex items-center justify-center gap-2
+                      ${book.available && !holdForBook?.status
+                        ? 'bg-library-accent hover:bg-library-accent/90 shadow-lg shadow-library-accent/30 hover:shadow-xl hover:shadow-library-accent/40'
+                        : (holdForBook?.status === 'pending' || holdForBook?.status === 'approved')
+                          ? 'bg-white/10 cursor-not-allowed'
+                          : 'bg-white/10 cursor-not-allowed'
+                      }
+                      ${isActionLoading ? 'opacity-70 cursor-wait' : ''}
+                    `}
+                  >
+                    {isActionLoading ? (
+                      <>
+                        <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Processing...
+                      </>
+                    ) : holdForBook?.status === 'pending' ? (
+                      'Pending approval'
+                    ) : holdForBook?.status === 'approved' ? (
+                      'Hold approved – come pick up'
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        {book.available ? 'Place Hold' : 'Join Waitlist'}
+                      </>
+                    )}
+                  </button>
+                ) : (
+                  <Link
+                    to="/login"
+                    className="w-full py-3.5 rounded-lg font-semibold text-white bg-white/10 border border-white/20 flex items-center justify-center gap-2 hover:bg-white/15 transition-all"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    Log in to place a hold
+                  </Link>
+                )}
 
                 <button
                   onClick={() => navigate(-1)}
@@ -213,6 +288,9 @@ export default function BookDetailPage() {
                 <h1 className="text-3xl lg:text-4xl font-bold text-white leading-tight mb-3">
                   {book.title}
                 </h1>
+                {book.subtitle && (
+                  <p className="text-lg text-white/80 mb-2">{book.subtitle}</p>
+                )}
                 <p className="text-xl text-library-accent font-medium">
                   by {book.author}
                 </p>
@@ -251,14 +329,21 @@ export default function BookDetailPage() {
                   <DetailItem label="Availability" value={book.available ? 'Available' : 'Checked Out'} />
                   <DetailItem label="Copies in Library" value={book.quantity.toString()} />
                   <DetailItem label="Price Value" value={`$${book.price.toFixed(2)}`} />
+                  {book.genre && <DetailItem label="Genre" value={book.genre} />}
+                  {book.language && <DetailItem label="Language" value={book.language} />}
+                  {book.yearPublished != null && <DetailItem label="Year Published" value={String(book.yearPublished)} />}
+                  {book.publisher && <DetailItem label="Publisher" value={book.publisher} />}
+                  {book.pages != null && <DetailItem label="Pages" value={String(book.pages)} />}
+                  {book.isbn && <DetailItem label="ISBN" value={book.isbn} />}
                   <DetailItem label="Added to Catalog" value={formatDate(book.createdAt)} />
                   <DetailItem label="Last Updated" value={formatDate(book.updatedAt)} />
                 </div>
               </div>
 
-              {/* Related Actions */}
+              {/* Related Actions - disabled when logged out */}
               <div className="flex flex-wrap gap-3 pt-4">
                 <ActionChip 
+                  disabled={!isAuthenticated}
                   icon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
@@ -267,6 +352,7 @@ export default function BookDetailPage() {
                   label="Add to Reading List"
                 />
                 <ActionChip 
+                  disabled={!isAuthenticated}
                   icon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -275,6 +361,7 @@ export default function BookDetailPage() {
                   label="Share"
                 />
                 <ActionChip 
+                  disabled={!isAuthenticated}
                   icon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
@@ -301,9 +388,26 @@ function DetailItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function ActionChip({ icon, label }: { icon: React.ReactNode; label: string }) {
+function ActionChip({
+  icon,
+  label,
+  disabled = false,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  disabled?: boolean;
+}) {
   return (
-    <button className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/80 hover:bg-white/10 hover:text-white transition-all text-sm">
+    <button
+      type="button"
+      disabled={disabled}
+      className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all
+        ${disabled
+          ? 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
+          : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white'
+        }`}
+      title={disabled ? 'Log in to use this feature' : undefined}
+    >
       {icon}
       {label}
     </button>

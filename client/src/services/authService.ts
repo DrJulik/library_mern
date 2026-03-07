@@ -58,9 +58,17 @@ const authService = {
     return response.data;
   },
 
-  // Update password
-  updatePassword: async (oldPassword: string, newPassword: string): Promise<{ success: boolean; message: string }> => {
-    const response = await api.put('/v1/auth/password/update', { oldPassword, newPassword });
+  // Update password (backend expects currentPassword, newPassword, confirmNewPassword)
+  updatePassword: async (
+    currentPassword: string,
+    newPassword: string,
+    confirmNewPassword: string
+  ): Promise<{ success: boolean; message: string }> => {
+    const response = await api.put('/v1/auth/password/update', {
+      currentPassword,
+      newPassword,
+      confirmNewPassword,
+    });
     return response.data;
   },
 };

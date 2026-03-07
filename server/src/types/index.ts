@@ -38,6 +38,15 @@ export interface IBook extends Document {
   price: number;
   quantity: number;
   available: boolean;
+  genre?: string;
+  language?: string;
+  yearPublished?: number;
+  imageLink?: string;
+  isbn?: string;
+  publisher?: string;
+  pages?: number;
+  slug?: string;
+  subtitle?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -52,6 +61,16 @@ export interface IBorrow extends Document {
   fine: number;
   notified: boolean;
   status: 'pending' | 'borrowed' | 'returned' | 'overdue';
+}
+
+// Hold Types
+export type HoldStatus = 'pending' | 'approved' | 'fulfilled' | 'cancelled';
+
+export interface IHold extends Document {
+  user: Types.ObjectId | IUser;
+  book: Types.ObjectId | IBook;
+  status: HoldStatus;
+  createdAt: Date;
 }
 
 // Request Types

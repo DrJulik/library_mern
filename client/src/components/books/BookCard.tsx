@@ -72,25 +72,21 @@ export default function BookCard({
             {badge.text}
           </div>
         )}
-        
-        {/* Availability indicator */}
-        {!book.available && (
-          <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-sm">
-            <span className="px-2 py-1 bg-gray-800/90 text-white text-xs font-medium rounded">
-              Unavailable
-            </span>
-          </div>
-        )}
       </div>
 
-      {/* Book Info */}
-      <div className="flex-1 min-w-0">
+      {/* Book Info - min-height keeps button aligned when titles vary */}
+      <div className="flex-1 min-w-0 min-h-[3.5rem] flex flex-col">
         <h3 className="text-sm font-medium text-gray-900 line-clamp-2 group-hover:text-library-600 transition-colors">
           {book.title}
         </h3>
         <p className="text-xs text-gray-500 line-clamp-1 mt-0.5">
           {book.author}
         </p>
+        {book.genre && (
+          <span className="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 w-fit">
+            {book.genre}
+          </span>
+        )}
         
         {/* Rating */}
         {showRating && rating !== undefined && (

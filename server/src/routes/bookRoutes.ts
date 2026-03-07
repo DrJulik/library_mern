@@ -1,12 +1,14 @@
 import express from 'express';
 import { isAuthenticated, isAuthorized } from '../middlewares/authMiddleware';
-import { addBook, deleteBook, getAllBooks } from '../controllers/bookController';
+import { addBook, deleteBook, getAllBooks, getBookById, bulkUploadBooks } from '../controllers/bookController';
 
 const router = express.Router();
 
 router.post('/add', isAuthenticated, isAuthorized('admin'), addBook);
 router.delete('/delete/:id', isAuthenticated, isAuthorized('admin'), deleteBook);
 router.get('/all', getAllBooks);
+router.post('/bulk', isAuthenticated, isAuthorized('admin'), bulkUploadBooks);
+router.get('/:id', getBookById);
 
 export default router;
 

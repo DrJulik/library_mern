@@ -62,7 +62,7 @@ export default function UserDashboard() {
     <Layout>
       <div className="bg-gray-50 min-h-full">
         {/* Header */}
-        <div className="bg-white border-b border-gray-200">
+        {/* <div className="bg-white border-b border-gray-200">
           <div className="container mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
               <div>
@@ -91,7 +91,7 @@ export default function UserDashboard() {
               </div>
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Main Content */}
         <div className="container mx-auto px-4 py-6">

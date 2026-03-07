@@ -68,7 +68,7 @@ export default function BookGrid({
     checkScroll();
     window.addEventListener('resize', checkScroll);
     return () => window.removeEventListener('resize', checkScroll);
-  }, [books]);
+  }, [books.length]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {

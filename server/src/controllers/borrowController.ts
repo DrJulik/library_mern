@@ -2,6 +2,7 @@ import { Response, NextFunction } from 'express';
 import { catchAsyncErrors, ErrorHandler } from '../middlewares/errorMiddleware';
 import Borrow from '../models/borrowModel';
 import Book from '../models/bookModel';
+import Hold from '../models/holdModel';
 import User from '../models/userModel';
 import { AuthRequest } from '../types';
 
@@ -40,7 +41,15 @@ export const recordBorrowedBook = catchAsyncErrors(
       return next(new ErrorHandler('User not found', 404));
     }
 
-    if (book.quantity <= 0) {
+    const approvedHold = await Hold.findOne({
+      user: user._id,
+      book: bookId,
+      status: 'approved',
+    });
+    const fulfillingHold = !!approvedHold;
+
+    // When fulfilling an approved hold, the copy was already reserved (quantity decremented on approve)
+    if (!fulfillingHold && book.quantity <= 0) {
       return next(new ErrorHandler('Book is not available', 400));
     }
 
@@ -56,9 +65,11 @@ export const recordBorrowedBook = catchAsyncErrors(
       return next(new ErrorHandler('You have already borrowed this book', 400));
     }
 
-    book.quantity -= 1;
-    book.available = book.quantity > 0;
-    await book.save();
+    if (!fulfillingHold) {
+      book.quantity -= 1;
+      book.available = book.quantity > 0;
+      await book.save();
+    }
 
     const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
@@ -79,6 +90,11 @@ export const recordBorrowedBook = catchAsyncErrors(
       dueDate,
       status: 'borrowed',
     });
+
+    await Hold.updateOne(
+      { user: user._id, book: bookId, status: 'approved' },
+      { status: 'fulfilled' }
+    );
 
     res.status(200).json({ 
       success: true,

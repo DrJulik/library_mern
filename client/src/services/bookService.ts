@@ -1,49 +1,5 @@
-import axios from 'axios';
 import api from './api';
 import { Book, CreateBookData, BooksResponse } from '../types';
-
-const JSON_SERVER_URL = import.meta.env.VITE_JSON_SERVER_URL || 'http://localhost:3004';
-
-interface JsonServerBook {
-  id?: number;
-  author?: string;
-  country?: string;
-  imageLink?: string;
-  language?: string;
-  link?: string;
-  pages?: number;
-  title?: string;
-  year?: number;
-  [key: string]: unknown;
-}
-
-function mapJsonBookToAppBook(raw: JsonServerBook, index: number): Book {
-  const id = raw.id ?? index + 1;
-  const now = new Date().toISOString();
-  const description =
-    typeof raw.description === 'string'
-      ? raw.description
-      : `${raw.pages ?? 0} pages. ${raw.language ?? ''}. ${raw.country ?? ''}.`;
-  const imageLink =
-    typeof raw.imageLink === 'string' && raw.imageLink
-      ? raw.imageLink.startsWith('/') || raw.imageLink.startsWith('http')
-        ? raw.imageLink
-        : `/${raw.imageLink.replace(/^\//, '')}`
-      : undefined;
-
-  return {
-    _id: String(id),
-    title: raw.title ?? '',
-    author: raw.author ?? '',
-    description,
-    price: typeof raw.price === 'number' ? raw.price : 0,
-    quantity: typeof raw.quantity === 'number' ? raw.quantity : 1,
-    available: raw.available !== false,
-    createdAt: now,
-    updatedAt: now,
-    imageLink,
-  };
-}
 
 interface SingleBookResponse {
   success: boolean;
@@ -51,19 +7,18 @@ interface SingleBookResponse {
 }
 
 const bookService = {
-  // Get all books from JSON Server
+  // Get all books from MERN API (so book._id is MongoDB id for hold/borrow)
   getAllBooks: async (): Promise<BooksResponse> => {
-    const response = await axios.get<JsonServerBook[]>(`${JSON_SERVER_URL}/books`);
-    const list = Array.isArray(response.data) ? response.data : [];
-    const books = list.map(mapJsonBookToAppBook);
+    const response = await api.get<{ success: boolean; books: Book[] }>('/v1/book/all');
+    const books = response.data?.books ?? [];
     return { success: true, books };
   },
 
-  // Get a single book by ID from JSON Server
+  // Get a single book by ID from MERN API (so book._id is MongoDB id for hold/borrow)
   getBookById: async (bookId: string): Promise<SingleBookResponse> => {
     try {
-      const response = await axios.get<JsonServerBook>(`${JSON_SERVER_URL}/books/${bookId}`);
-      const book = response.data ? mapJsonBookToAppBook(response.data, Number(bookId) || 0) : null;
+      const response = await api.get<{ success: boolean; book: Book }>(`/v1/book/${bookId}`);
+      const book = response.data?.book ?? null;
       return { success: !!book, book };
     } catch {
       return { success: false, book: null };

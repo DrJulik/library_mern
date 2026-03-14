@@ -4,6 +4,7 @@ import Layout from '@/layouts/Layout';
 import { Book, Hold } from '@/types';
 import bookService from '@/services/bookService';
 import holdService from '@/services/holdService';
+import ratingService from '@/services/ratingService';
 import BookCover from '@/components/books/BookCover';
 import StarRating from '@/components/books/StarRating';
 import { useAuthStore, selectIsAuthenticated } from '@/store/useAuthStore';
@@ -17,6 +18,7 @@ export default function BookDetailPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isActionLoading, setIsActionLoading] = useState(false);
+  const [isRatingLoading, setIsRatingLoading] = useState(false);
   const [holdForBook, setHoldForBook] = useState<Hold | null>(null);
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [holdError, setHoldError] = useState<string | null>(null);
@@ -89,6 +91,22 @@ export default function BookDetailPage() {
       setHoldError(getApiErrorMessage(err));
     } finally {
       setIsActionLoading(false);
+    }
+  };
+
+  const handleRateBook = async (rating: number) => {
+    if (!book) return;
+    setIsRatingLoading(true);
+    try {
+      await ratingService.submitRating(book._id, rating);
+      const response = await bookService.getBookById(book._id);
+      if (response.success && response.book) {
+        setBook(response.book);
+      }
+    } catch (err) {
+      console.error('Failed to submit rating:', err);
+    } finally {
+      setIsRatingLoading(false);
     }
   };
 
@@ -296,11 +314,33 @@ export default function BookDetailPage() {
                 </p>
               </div>
 
-              {/* Rating Section - Placeholder for now */}
-              <div className="flex items-center gap-4 pb-6 border-b border-white/10">
-                <StarRating rating={4.5} size="md" showValue />
-                <span className="text-white/50 text-sm">•</span>
-                <span className="text-white/70 text-sm">Based on library ratings</span>
+              {/* Rating Section */}
+              <div className="flex flex-wrap items-center gap-4 pb-6 border-b border-white/10">
+                {book.averageRating != null && book.ratingCount != null && book.ratingCount > 0 ? (
+                  <>
+                    <StarRating rating={book.averageRating} size="md" showValue />
+                    <span className="text-white/50 text-sm">•</span>
+                    <span className="text-white/70 text-sm">
+                      {book.ratingCount} {book.ratingCount === 1 ? 'rating' : 'ratings'}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-white/50 text-sm">No ratings yet</span>
+                )}
+                {isAuthenticated && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <span className="text-white/70 text-sm">
+                      {book.userRating != null ? 'Your rating:' : 'Rate this book:'}
+                    </span>
+                    <StarRating
+                      rating={book.userRating ?? 0}
+                      size="md"
+                      showValue={book.userRating != null}
+                      interactive={!isRatingLoading}
+                      onChange={handleRateBook}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Description */}

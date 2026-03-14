@@ -38,6 +38,9 @@ export interface Book {
   subtitle?: string;
   createdAt: string;
   updatedAt: string;
+  averageRating?: number | null;
+  ratingCount?: number;
+  userRating?: number | null;
 }
 
 export interface CreateBookData {

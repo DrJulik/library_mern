@@ -223,7 +223,13 @@ export default function NewTitlesGallery({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-6">
         {paginatedBooks.map((book) => (
           <Link key={book._id} to={`/books/${book._id}`}>
-            <BookCard book={book} showAction={false} linkToDetail={false} />
+            <BookCard
+              book={book}
+              showAction={false}
+              linkToDetail={false}
+              showRating={book.averageRating != null}
+              rating={book.averageRating ?? 0}
+            />
           </Link>
         ))}
       </div>

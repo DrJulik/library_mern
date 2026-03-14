@@ -172,8 +172,8 @@ export default function BookGrid({
                   <BookCard
                     book={book}
                     variant={variant}
-                    showRating={showRating}
-                    rating={ratings[book._id]}
+                    showRating={showRating && (ratings[book._id] ?? book.averageRating) != null}
+                    rating={ratings[book._id] ?? book.averageRating ?? 0}
                     showAction={showAction}
                     actionLabel={actionLabel}
                     onAction={onAction}
@@ -194,8 +194,8 @@ export default function BookGrid({
                 key={book._id}
                 book={book}
                 variant={variant}
-                showRating={showRating}
-                rating={ratings[book._id]}
+                showRating={showRating && (ratings[book._id] ?? book.averageRating) != null}
+                rating={ratings[book._id] ?? book.averageRating ?? 0}
                 showAction={showAction}
                 actionLabel={actionLabel}
                 onAction={onAction}

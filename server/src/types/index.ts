@@ -63,6 +63,15 @@ export interface IBorrow extends Document {
   status: 'pending' | 'borrowed' | 'returned' | 'overdue';
 }
 
+// Rating Types
+export interface IRating extends Document {
+  user: Types.ObjectId | IUser;
+  book: Types.ObjectId | IBook;
+  rating: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 // Hold Types
 export type HoldStatus = 'pending' | 'approved' | 'fulfilled' | 'cancelled';
 

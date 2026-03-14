@@ -1,5 +1,7 @@
 import { Response, NextFunction } from 'express';
+import mongoose from 'mongoose';
 import Book from '../models/bookModel';
+import Rating from '../models/ratingModel';
 import { catchAsyncErrors, ErrorHandler } from '../middlewares/errorMiddleware';
 import { AuthRequest } from '../types';
 
@@ -55,7 +57,23 @@ export const deleteBook = catchAsyncErrors(
 export const getAllBooks = catchAsyncErrors(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
     const books = await Book.find();
-    res.status(200).json({ success: true, books });
+    const bookIds = books.map((b) => b._id);
+    const ratingStats = await Rating.aggregate([
+      { $match: { book: { $in: bookIds } } },
+      { $group: { _id: '$book', avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+    ]);
+    const ratingMap = new Map(
+      ratingStats.map((r) => [r._id.toString(), { averageRating: Math.round(r.avg * 10) / 10, ratingCount: r.count }])
+    );
+    const booksWithRatings = books.map((b) => {
+      const stats = ratingMap.get(b._id.toString());
+      return {
+        ...b.toObject(),
+        averageRating: stats?.averageRating ?? null,
+        ratingCount: stats?.ratingCount ?? 0,
+      };
+    });
+    res.status(200).json({ success: true, books: booksWithRatings });
   }
 );
 
@@ -66,7 +84,30 @@ export const getBookById = catchAsyncErrors(
     if (!book) {
       return next(new ErrorHandler('Book not found', 404));
     }
-    res.status(200).json({ success: true, book });
+    const bookId = book._id;
+    const [stats, userRatingDoc] = await Promise.all([
+      Rating.aggregate([
+        { $match: { book: new mongoose.Types.ObjectId(bookId) } },
+        { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+      ]),
+      req.user
+        ? Rating.findOne({ user: req.user._id, book: bookId }).select('rating')
+        : Promise.resolve(null),
+    ]);
+    const agg = stats[0];
+    const averageRating = agg ? Math.round(agg.avg * 10) / 10 : null;
+    const ratingCount = agg?.count ?? 0;
+    const userRating = userRatingDoc ? userRatingDoc.rating : null;
+    const bookObj = book.toObject();
+    res.status(200).json({
+      success: true,
+      book: {
+        ...bookObj,
+        averageRating,
+        ratingCount,
+        userRating,
+      },
+    });
   }
 );
 

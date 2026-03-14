@@ -229,6 +229,7 @@ export default function BookCatalogPage() {
               title="All books"
               viewAllLink="/books"
               columns={6}
+              showRating
               emptyMessage={hasActiveFilters ? 'No books match your filters. Try changing or clearing them.' : 'No books in the catalog.'}
             />
             {books.length > BOOKS_PER_PAGE && (

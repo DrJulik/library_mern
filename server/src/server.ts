@@ -9,6 +9,7 @@ import authRoutes from './routes/authRoutes';
 import bookRoutes from './routes/bookRoutes';
 import borrowRoutes from './routes/borrowRoutes';
 import holdRoutes from './routes/holdRoutes';
+import ratingRoutes from './routes/ratingRoutes';
 import userRoutes from './routes/userRoutes';
 import { notifyUsers } from './services/notifyUsers';
 import { removeUnverifiedAccounts } from './services/removeUnverifiedAccounts';
@@ -44,6 +45,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/borrow', borrowRoutes);
 app.use('/api/v1/hold', holdRoutes);
+app.use('/api/v1/rating', ratingRoutes);
 app.use('/api/v1/user', userRoutes);
 
 // Health check endpoint

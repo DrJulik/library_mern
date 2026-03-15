@@ -7,6 +7,7 @@ export const routeTitles: Record<string, string> = {
   '/privacy': 'Privacy Statement',
   '/terms': 'Terms of Use',
   '/accessibility': 'Accessibility Statement',
+  '/contact': 'Contact',
   '/login': 'Login',
   '/register': 'Register',
   '/verify-otp': 'Verify OTP',

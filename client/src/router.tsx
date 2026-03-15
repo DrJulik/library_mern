@@ -7,6 +7,7 @@ import {
   PrivacyStatementPage,
   TermsOfUsePage,
   AccessibilityStatementPage,
+  ContactPage,
   LoginPage,
   RegisterPage,
   ForgotPasswordPage,
@@ -53,6 +54,10 @@ const routes: RouteObject[] = [
   {
     path: '/accessibility',
     element: <AccessibilityStatementPage />,
+  },
+  {
+    path: '/contact',
+    element: <ContactPage />,
   },
   {
     element: <PublicRoute />,

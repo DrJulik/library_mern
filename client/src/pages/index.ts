@@ -3,6 +3,7 @@ export { default as HomePage } from './HomePage';
 export { default as PrivacyStatementPage } from './PrivacyStatementPage';
 export { default as TermsOfUsePage } from './TermsOfUsePage';
 export { default as AccessibilityStatementPage } from './AccessibilityStatementPage';
+export { default as ContactPage } from './ContactPage';
 export { default as LoginPage } from './LoginPage';
 export { default as RegisterPage } from './RegisterPage';
 export { default as ForgotPasswordPage } from './ForgotPasswordPage';

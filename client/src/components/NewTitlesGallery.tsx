@@ -110,8 +110,11 @@ export default function NewTitlesGallery({
   if (loading && books.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-center py-16">
+        <div className="flex flex-col items-center justify-center py-16 gap-6">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-library-600" />
+          <p className="text-xl text-center text-gray-600 max-w-xl">
+            Backend is waking up, I'm not paying 5 bucks to host a backend. I got two kids to feed!
+          </p>
         </div>
       </div>
     );

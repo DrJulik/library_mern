@@ -55,6 +55,11 @@ library_mern/
    EMAIL_PORT=587
    EMAIL_USER=your_email@gmail.com
    EMAIL_PASSWORD=your_email_app_password
+   
+   # Cloudinary (for book cover image uploads)
+   CLOUDINARY_CLOUD_NAME=your_cloud_name
+   CLOUDINARY_API_KEY=your_api_key
+   CLOUDINARY_API_SECRET=your_api_secret
    ```
 
 ## 🛠️ Development
@@ -88,6 +93,8 @@ The backend API is built with:
 - **Bcrypt** – Password hashing
 - **Nodemailer** – Email (verification, password reset, overdue reminders)
 - **Node-cron** – Scheduled tasks
+- **Cloudinary** – Book cover image storage
+- **express-fileupload** – Multipart file uploads
 
 ### Server Features
 
@@ -95,6 +102,7 @@ The backend API is built with:
 - Password reset via email link
 - Role-based access control (Admin/User)
 - Book management (add, delete, bulk upload)
+- Book cover uploads to Cloudinary (or paste URL)
 - Holds system (place, approve, reject, release)
 - Borrowing (admin records checkout/return by user email)
 - Book ratings (1–5 stars, one per user per book)
@@ -204,6 +212,12 @@ All API routes are prefixed with `/api/v1`. Auth uses HTTP-only cookies.
 | POST | `/:bookId` | User | Submit/update rating (body: `{ rating: 1-5 }`) |
 | GET | `/:bookId` | Optional | Get current user's rating for book |
 
+### Upload (`/api/v1/upload`)
+
+| Method | Endpoint | Auth | Description |
+|--------|----------|------|-------------|
+| POST | `/book-image` | Admin | Upload book cover (multipart form field `image`). Returns `{ url, publicId }`. Max 5MB, JPEG/PNG/WebP/GIF. |
+
 ### Users (`/api/v1/user`)
 
 | Method | Endpoint | Auth | Description |
@@ -228,6 +242,8 @@ All API routes are prefixed with `/api/v1`. Auth uses HTTP-only cookies.
 - Bcrypt
 - Nodemailer
 - Node-cron
+- Cloudinary
+- express-fileupload
 
 ### Frontend
 

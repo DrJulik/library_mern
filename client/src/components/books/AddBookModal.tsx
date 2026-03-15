@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import { CreateBookData } from '@/types';
 import { getApiErrorMessage } from '@/services/api';
+import uploadService from '@/services/uploadService';
 
 interface AddBookModalProps {
   isOpen: boolean;
@@ -21,10 +22,15 @@ const initialForm: CreateBookData = {
   subtitle: '',
 };
 
+const ACCEPT_IMAGES = 'image/jpeg,image/png,image/webp,image/gif';
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
+
 export default function AddBookModal({ isOpen, onClose, onSubmit }: AddBookModalProps) {
   const [form, setForm] = useState<CreateBookData>(initialForm);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -69,10 +75,36 @@ export default function AddBookModal({ isOpen, onClose, onSubmit }: AddBookModal
   };
 
   const handleClose = () => {
-    if (!isLoading) {
+    if (!isLoading && !isUploading) {
       setForm(initialForm);
       setError(null);
       onClose();
+    }
+  };
+
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!ACCEPT_IMAGES.split(',').includes(file.type)) {
+      setError('Please select a JPEG, PNG, WebP, or GIF image.');
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      setError('Image must be under 5MB.');
+      return;
+    }
+
+    setIsUploading(true);
+    setError(null);
+    try {
+      const url = await uploadService.uploadBookImage(file);
+      setForm((prev) => ({ ...prev, imageLink: url }));
+    } catch (err) {
+      setError(getApiErrorMessage(err));
+    } finally {
+      setIsUploading(false);
+      e.target.value = '';
     }
   };
 
@@ -185,18 +217,48 @@ export default function AddBookModal({ isOpen, onClose, onSubmit }: AddBookModal
         </div>
 
         <div>
-          <label htmlFor="imageLink" className="block text-sm font-semibold text-gray-700 mb-1">
-            Cover image URL
+          <label className="block text-sm font-semibold text-gray-700 mb-1">
+            Cover image
           </label>
-          <input
-            id="imageLink"
-            name="imageLink"
-            type="url"
-            value={form.imageLink || ''}
-            onChange={handleChange}
-            className={inputClass}
-            placeholder="https://..."
-          />
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept={ACCEPT_IMAGES}
+                onChange={handleFileSelect}
+                disabled={isUploading}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="px-4 py-2.5 border-2 border-dashed border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:border-library-500 hover:text-library-600 hover:bg-library-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isUploading ? 'Uploading…' : 'Upload from device'}
+              </button>
+              <span className="flex items-center text-sm text-gray-500">or paste URL below</span>
+            </div>
+            <input
+              id="imageLink"
+              name="imageLink"
+              type="url"
+              value={form.imageLink || ''}
+              onChange={handleChange}
+              className={inputClass}
+              placeholder="https://... or upload above"
+            />
+            {form.imageLink && (
+              <div className="mt-2">
+                <img
+                  src={form.imageLink}
+                  alt="Cover preview"
+                  className="h-24 object-cover rounded border border-gray-200"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
@@ -215,7 +277,7 @@ export default function AddBookModal({ isOpen, onClose, onSubmit }: AddBookModal
         </div>
 
         <div className="flex gap-3 pt-2">
-          <Button type="submit" loading={isLoading} disabled={isLoading}>
+          <Button type="submit" loading={isLoading} disabled={isLoading || isUploading}>
             Add Book
           </Button>
           <Button type="button" variant="secondary" onClick={handleClose} disabled={isLoading}>

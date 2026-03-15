@@ -1,6 +1,7 @@
 import express, { Express } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
 import dotenv from 'dotenv';
 
 import connectDatabase from './db';
@@ -10,6 +11,7 @@ import bookRoutes from './routes/bookRoutes';
 import borrowRoutes from './routes/borrowRoutes';
 import holdRoutes from './routes/holdRoutes';
 import ratingRoutes from './routes/ratingRoutes';
+import uploadRoutes from './routes/uploadRoutes';
 import userRoutes from './routes/userRoutes';
 import { notifyUsers } from './services/notifyUsers';
 import { removeUnverifiedAccounts } from './services/removeUnverifiedAccounts';
@@ -32,6 +34,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(fileUpload({ limits: { fileSize: 5 * 1024 * 1024 } })); // 5MB
 
 // Connect to Database
 connectDatabase();
@@ -46,6 +49,7 @@ app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/borrow', borrowRoutes);
 app.use('/api/v1/hold', holdRoutes);
 app.use('/api/v1/rating', ratingRoutes);
+app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/user', userRoutes);
 
 // Health check endpoint

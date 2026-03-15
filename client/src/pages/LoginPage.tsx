@@ -3,11 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import Layout from '@/layouts/Layout';
 import Button from '@/components/ui/Button';
 import { useAuthStore } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 
 export default function LoginPage() {
   const navigate = useNavigate();
   const { login, isLoading, error, clearError } = useAuthStore();
   
+  const addToast = useUIStore((s) => s.addToast);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -39,13 +41,28 @@ export default function LoginPage() {
           <div className="bg-white rounded-2xl shadow-xl p-8 lg:p-10 order-2 lg:order-1">
             <div className="flex items-center gap-3 mb-8">
               <h1 className="text-3xl font-bold text-library-900">Log In</h1>
-              <button 
-                type="button"
-                className="w-6 h-6 rounded-full bg-library-600 text-white text-sm flex items-center justify-center hover:bg-library-700 transition-colors"
-                title="Login help"
-              >
-                ?
-              </button>
+              <div className="relative">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 z-10">
+                  <span className="block px-4 py-2.5 bg-white rounded-2xl shadow-lg text-sm text-gray-700 whitespace-nowrap ring-1 ring-gray-100">
+                    Click me for admin login
+                  </span>
+                  <div className="absolute left-1/2 -translate-x-1/2 top-full w-0 h-0 border-l-8 border-r-8 border-t-8 border-l-transparent border-r-transparent border-t-white" />
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    addToast({
+                      type: 'success',
+                      message: 'Admin: batman@gmail.com · Password: imbatman',
+                    })
+                  }
+                  className="w-6 h-6 rounded-full bg-library-600 text-white text-sm flex items-center justify-center hover:bg-library-700 transition-colors"
+                  title="Login help"
+                  aria-label="Show admin login"
+                >
+                  ?
+                </button>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">

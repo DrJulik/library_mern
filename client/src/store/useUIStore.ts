@@ -56,7 +56,7 @@ export const useUIStore = create<UIStore>()(
         set((state) => ({ toasts: [...state.toasts, newToast] }));
 
         // Auto remove toast after duration
-        const duration = toast.duration || 3000;
+        const duration = toast.duration ?? 6000;
         setTimeout(() => {
           get().removeToast(id);
         }, duration);

@@ -16,6 +16,7 @@ import {
   BookCatalogPage,
   BookDetailPage,
   MyBooksPage,
+  ReadingListPage,
   ProfilePage,
   AdminDashboard,
   ManageBooksPage,
@@ -90,6 +91,10 @@ const routes: RouteObject[] = [
       {
         path: '/my-books',
         element: <MyBooksPage />,
+      },
+      {
+        path: '/reading-list',
+        element: <ReadingListPage />,
       },
       {
         path: '/profile',

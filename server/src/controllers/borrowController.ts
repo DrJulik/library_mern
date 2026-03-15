@@ -5,6 +5,7 @@ import Book from '../models/bookModel';
 import Hold from '../models/holdModel';
 import User from '../models/userModel';
 import { AuthRequest } from '../types';
+import { notifyUsersBookAvailable } from './notifyRequestController';
 
 export const borrowedBooks = catchAsyncErrors(
   async (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -134,6 +135,10 @@ export const recordReturnedBook = catchAsyncErrors(
     book.quantity += 1;
     book.available = book.quantity > 0;
     await book.save();
+
+    if (book.available) {
+      notifyUsersBookAvailable(bookId, book.title).catch((err) => console.error('Notify availability:', err));
+    }
 
     const borrow = await Borrow.findOne({
       book: bookId,

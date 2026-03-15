@@ -15,6 +15,7 @@ export const routeTitles: Record<string, string> = {
   '/dashboard': 'Dashboard',
   '/books': 'Book Catalog',
   '/my-books': 'My Books',
+  '/reading-list': 'Reading List',
   '/profile': 'Profile',
   '/admin': 'Admin Dashboard',
   '/admin/books': 'Manage Books',

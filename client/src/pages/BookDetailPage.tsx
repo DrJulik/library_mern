@@ -5,15 +5,19 @@ import { Book, Hold } from '@/types';
 import bookService from '@/services/bookService';
 import holdService from '@/services/holdService';
 import ratingService from '@/services/ratingService';
+import readingListService from '@/services/readingListService';
+import notifyRequestService from '@/services/notifyRequestService';
 import BookCover from '@/components/books/BookCover';
 import StarRating from '@/components/books/StarRating';
 import { useAuthStore, selectIsAuthenticated } from '@/store/useAuthStore';
+import { useUIStore } from '@/store/useUIStore';
 import { getApiErrorMessage } from '@/services/api';
 
 export default function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isAuthenticated = useAuthStore(selectIsAuthenticated);
+  const addToast = useUIStore((s) => s.addToast);
   const [book, setBook] = useState<Book | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,6 +26,10 @@ export default function BookDetailPage() {
   const [holdForBook, setHoldForBook] = useState<Hold | null>(null);
   const [holdMessage, setHoldMessage] = useState<string | null>(null);
   const [holdError, setHoldError] = useState<string | null>(null);
+  const [inReadingList, setInReadingList] = useState(false);
+  const [notifyRequested, setNotifyRequested] = useState(false);
+  const [isReadingListLoading, setIsReadingListLoading] = useState(false);
+  const [isNotifyLoading, setIsNotifyLoading] = useState(false);
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -58,20 +66,30 @@ export default function BookDetailPage() {
   useEffect(() => {
     if (!book || !isAuthenticated) {
       setHoldForBook(null);
+      setInReadingList(false);
+      setNotifyRequested(false);
       return;
     }
-    const fetchMyHolds = async () => {
+    const fetchHoldsAndStatus = async () => {
       try {
-        const res = await holdService.getMyHolds();
-        const myHold = res.holds?.find(
+        const [holdRes, listRes, notifyRes] = await Promise.all([
+          holdService.getMyHolds(),
+          readingListService.check(book._id),
+          notifyRequestService.check(book._id),
+        ]);
+        const myHold = holdRes.holds?.find(
           (h) => (typeof h.book === 'object' && h.book._id === book._id) || (typeof h.book === 'string' && h.book === book._id)
         );
         setHoldForBook(myHold ?? null);
+        setInReadingList(listRes.inList ?? false);
+        setNotifyRequested(notifyRes.notified ?? false);
       } catch {
         setHoldForBook(null);
+        setInReadingList(false);
+        setNotifyRequested(false);
       }
     };
-    fetchMyHolds();
+    fetchHoldsAndStatus();
   }, [book?._id, isAuthenticated]);
 
   const handlePlaceHold = async () => {
@@ -91,6 +109,67 @@ export default function BookDetailPage() {
       setHoldError(getApiErrorMessage(err));
     } finally {
       setIsActionLoading(false);
+    }
+  };
+
+  const handleReadingListToggle = async () => {
+    if (!book) return;
+    setIsReadingListLoading(true);
+    try {
+      if (inReadingList) {
+        await readingListService.remove(book._id);
+        setInReadingList(false);
+        addToast({ type: 'success', message: 'Removed from reading list' });
+      } else {
+        await readingListService.add(book._id);
+        setInReadingList(true);
+        addToast({ type: 'success', message: 'Added to reading list' });
+      }
+    } catch (err) {
+      addToast({ type: 'error', message: getApiErrorMessage(err) });
+    } finally {
+      setIsReadingListLoading(false);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!book) return;
+    const url = `${window.location.origin}/books/${book._id}`;
+    const shareData = { title: book.title, text: `${book.title} by ${book.author}`, url };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        addToast({ type: 'success', message: 'Shared!' });
+      } catch (err) {
+        if ((err as Error).name !== 'AbortError') {
+          await navigator.clipboard.writeText(url);
+          addToast({ type: 'success', message: 'Link copied to clipboard' });
+        }
+      }
+    } else {
+      await navigator.clipboard.writeText(url);
+      addToast({ type: 'success', message: 'Link copied to clipboard' });
+    }
+  };
+
+  const handleNotifyToggle = async () => {
+    if (!book) return;
+    if (book.available) return;
+    setIsNotifyLoading(true);
+    try {
+      if (notifyRequested) {
+        await notifyRequestService.remove(book._id);
+        setNotifyRequested(false);
+        addToast({ type: 'success', message: 'Notification removed' });
+      } else {
+        await notifyRequestService.add(book._id);
+        setNotifyRequested(true);
+        addToast({ type: 'success', message: "We'll email you when it's available" });
+      }
+    } catch (err) {
+      addToast({ type: 'error', message: getApiErrorMessage(err) });
+    } finally {
+      setIsNotifyLoading(false);
     }
   };
 
@@ -380,19 +459,23 @@ export default function BookDetailPage() {
                 </div>
               </div>
 
-              {/* Related Actions - disabled when logged out */}
+              {/* Related Actions */}
               <div className="flex flex-wrap gap-3 pt-4">
-                <ActionChip 
+                <ActionChip
                   disabled={!isAuthenticated}
+                  loading={isReadingListLoading}
+                  active={inReadingList}
+                  onClick={handleReadingListToggle}
                   icon={
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4" fill={inReadingList ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
                     </svg>
                   }
-                  label="Add to Reading List"
+                  label={inReadingList ? 'In Reading List' : 'Add to Reading List'}
                 />
-                <ActionChip 
-                  disabled={!isAuthenticated}
+                <ActionChip
+                  disabled={false}
+                  onClick={handleShare}
                   icon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -400,14 +483,23 @@ export default function BookDetailPage() {
                   }
                   label="Share"
                 />
-                <ActionChip 
-                  disabled={!isAuthenticated}
+                <ActionChip
+                  disabled={!isAuthenticated || book.available}
+                  loading={isNotifyLoading}
+                  active={notifyRequested}
+                  onClick={handleNotifyToggle}
                   icon={
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
                     </svg>
                   }
-                  label="Notify When Available"
+                  label={
+                    book.available
+                      ? 'Available now'
+                      : notifyRequested
+                        ? "We'll notify you"
+                        : 'Notify When Available'
+                  }
                 />
               </div>
             </div>
@@ -432,23 +524,39 @@ function ActionChip({
   icon,
   label,
   disabled = false,
+  loading = false,
+  active = false,
+  onClick,
 }: {
   icon: React.ReactNode;
   label: string;
   disabled?: boolean;
+  loading?: boolean;
+  active?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
-      disabled={disabled}
+      disabled={disabled || loading}
+      onClick={onClick}
       className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm transition-all
-        ${disabled
+        ${disabled || loading
           ? 'bg-white/5 border-white/10 text-white/40 cursor-not-allowed'
-          : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white'
+          : active
+            ? 'bg-library-accent/20 border-library-accent/40 text-library-accent hover:bg-library-accent/30'
+            : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white'
         }`}
       title={disabled ? 'Log in to use this feature' : undefined}
     >
-      {icon}
+      {loading ? (
+        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+        </svg>
+      ) : (
+        icon
+      )}
       {label}
     </button>
   );

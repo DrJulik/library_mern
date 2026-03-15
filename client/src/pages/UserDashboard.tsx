@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Layout from '@/layouts/Layout';
 import { useAuthStore } from '@/store/useAuthStore';
 import borrowService from '@/services/borrowService';
+import readingListService from '@/services/readingListService';
 import { BorrowedBook, Book } from '@/types';
 import { BookGrid, BookList } from '@/components/books';
 
@@ -21,26 +22,50 @@ function toDisplayBook(b: BorrowedBook): Book {
   };
 }
 
+type ActivityItem =
+  | { book: Book; type: 'borrowed' | 'returned'; date: string; dueDate?: string; isOverdue?: boolean }
+  | { book: Book; type: 'added_to_shelf'; date: string; label?: string };
+
 export default function UserDashboard() {
   const { user } = useAuthStore();
   const [borrowedBooks, setBorrowedBooks] = useState<BorrowedBook[]>([]);
+  const [readingListItems, setReadingListItems] = useState<{ book: Book; createdAt: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBorrowedBooks = async () => {
+    const fetchData = async () => {
       try {
-        const response = await borrowService.getMyBorrowedBooks();
-        if (response.success) {
-          setBorrowedBooks(response.borrowedBooks || []);
+        const [borrowRes, listRes] = await Promise.all([
+          borrowService.getMyBorrowedBooks(),
+          readingListService.getMine(),
+        ]);
+        if (borrowRes.success) setBorrowedBooks(borrowRes.borrowedBooks || []);
+        if (listRes.success && listRes.items) {
+          setReadingListItems(
+            listRes.items
+              .filter((i) => i.book)
+              .map((i) => ({
+                book: {
+                  ...i.book,
+                  description: i.book.description ?? '',
+                  price: 0,
+                  quantity: 1,
+                  available: false,
+                  createdAt: i.createdAt,
+                  updatedAt: i.createdAt,
+                } as Book,
+                createdAt: i.createdAt,
+              }))
+          );
         }
       } catch (error) {
-        console.error('Failed to fetch borrowed books:', error);
+        console.error('Failed to fetch dashboard data:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchBorrowedBooks();
+    fetchData();
   }, []);
 
   // API returns BorrowedBook[] with { bookId, returned, bookTitle, borrowedDate, dueDate }
@@ -50,23 +75,28 @@ export default function UserDashboard() {
   const returned = borrowedBooks.filter((b) => b.returned).length;
   const totalFines = 0; // API doesn't return fine data in user.borrowedBooks
 
-  // Get recent activity (last 5 transactions)
-  const recentActivity = [...borrowedBooks]
-    .sort((a, b) => new Date(b.borrowedDate).getTime() - new Date(a.borrowedDate).getTime())
-    .slice(0, 5);
-
-  // Currently borrowed - not returned
-  const currentlyBorrowedRecords = borrowedBooks.filter((b) => !b.returned);
-  const currentlyBorrowedBooks: Book[] = currentlyBorrowedRecords.map(toDisplayBook);
-
-  // Convert activity to BookList format
-  const activityItems = recentActivity.map((record) => ({
+  // Build combined activity: borrows/returns + reading list additions, sorted by date
+  const borrowActivities: ActivityItem[] = borrowedBooks.map((record) => ({
     book: toDisplayBook(record),
     type: (record.returned ? 'returned' : 'borrowed') as 'returned' | 'borrowed',
     date: record.borrowedDate,
     dueDate: record.dueDate,
     isOverdue: !record.returned && new Date(record.dueDate) < now,
   }));
+  const listActivities: ActivityItem[] = readingListItems.map(({ book, createdAt }) => ({
+    book,
+    type: 'added_to_shelf' as const,
+    date: createdAt,
+    label: 'Added to reading list',
+  }));
+  const allActivities = [...borrowActivities, ...listActivities].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const activityItems = allActivities.slice(0, 10);
+
+  // Currently borrowed - not returned
+  const currentlyBorrowedRecords = borrowedBooks.filter((b) => !b.returned);
+  const currentlyBorrowedBooks: Book[] = currentlyBorrowedRecords.map(toDisplayBook);
 
   return (
     <Layout>
@@ -231,6 +261,17 @@ export default function UserDashboard() {
                       </svg>
                     </div>
                     <span className="text-gray-700 group-hover:text-green-600">My Books</span>
+                  </Link>
+                  <Link 
+                    to="/reading-list" 
+                    className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group"
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center group-hover:bg-amber-200 transition-colors">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+                      </svg>
+                    </div>
+                    <span className="text-gray-700 group-hover:text-amber-600">Reading List</span>
                   </Link>
                   <Link 
                     to="/profile" 

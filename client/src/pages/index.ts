@@ -14,6 +14,7 @@ export { default as UserDashboard } from './UserDashboard';
 export { default as BookCatalogPage } from './BookCatalogPage';
 export { default as BookDetailPage } from './BookDetailPage';
 export { default as MyBooksPage } from './MyBooksPage';
+export { default as ReadingListPage } from './ReadingListPage';
 export { default as ProfilePage } from './ProfilePage';
 
 // Admin pages

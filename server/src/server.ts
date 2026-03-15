@@ -11,6 +11,8 @@ import bookRoutes from './routes/bookRoutes';
 import borrowRoutes from './routes/borrowRoutes';
 import holdRoutes from './routes/holdRoutes';
 import ratingRoutes from './routes/ratingRoutes';
+import readingListRoutes from './routes/readingListRoutes';
+import notifyRequestRoutes from './routes/notifyRequestRoutes';
 import uploadRoutes from './routes/uploadRoutes';
 import userRoutes from './routes/userRoutes';
 import { notifyUsers } from './services/notifyUsers';
@@ -49,6 +51,8 @@ app.use('/api/v1/book', bookRoutes);
 app.use('/api/v1/borrow', borrowRoutes);
 app.use('/api/v1/hold', holdRoutes);
 app.use('/api/v1/rating', ratingRoutes);
+app.use('/api/v1/reading-list', readingListRoutes);
+app.use('/api/v1/notify', notifyRequestRoutes);
 app.use('/api/v1/upload', uploadRoutes);
 app.use('/api/v1/user', userRoutes);
 

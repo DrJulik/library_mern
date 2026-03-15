@@ -137,11 +137,12 @@ export default function BookList({
       <div className="divide-y divide-gray-100">
         {activities.map((activity, index) => (
           <BookListItem
-            key={`${activity.book._id}-${index}`}
+            key={`${activity.book._id}-${activity.type}-${index}`}
             book={activity.book}
             activityType={activity.type}
             activityDate={activity.date}
             activityLabel={activity.label}
+            linkTo={`/books/${activity.book._id}`}
             userName={userName}
             userInitial={userInitial}
             showRating={activity.type === 'rated'}

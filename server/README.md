@@ -56,6 +56,11 @@ SMTP_PASSWORD=your_app_password
 pnpm dev
 ```
 
+### Seed Demonstration Accounts
+```bash
+pnpm seed:demo
+```
+
 ### Build for Production
 ```bash
 pnpm build

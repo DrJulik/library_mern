@@ -8,6 +8,7 @@
     "dev:server": "pnpm --filter server dev",
     "dev:client": "pnpm --filter client dev",
     "test": "pnpm --filter server test",
+    "seed:demo": "pnpm --filter server seed:demo",
     "start:server": "pnpm --filter server start",
     "start:client": "pnpm --filter client start",
     "build:client": "pnpm --filter client build",

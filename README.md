@@ -1,6 +1,60 @@
-# Library Management System - MERN Stack
+# Gotham City Public Library
 
-A full-stack library management application built with MongoDB, Express.js, React, and Node.js. **Gotham City Public Library** offers book catalogs, holds, borrowing, ratings, and admin management.
+A full-stack TypeScript library management system for catalog discovery, patron holds, admin approvals, checkout/return tracking, ratings, and availability notifications.
+
+**Repository About metadata:** description and topics are configured on GitHub. The website/demo field is intentionally still blank because no deployed demo URL is discoverable in this repository yet.
+
+## Live Demo
+
+**Deployment status:** pending. Add the production URL here before using this project on a resume.
+
+Suggested GitHub topics: `typescript`, `react`, `nodejs`, `express`, `mongodb`, `full-stack`, `mern-stack`.
+
+## Screenshots
+
+| Catalog and discovery | Book details and holds |
+|---|---|
+| ![Catalog and discovery screen](docs/screenshots/home-catalog.jpg) | ![Book detail hold screen](docs/screenshots/book-detail-hold.jpg) |
+
+| Admin hold approval | Borrowing records |
+|---|---|
+| ![Admin hold approval screen](docs/screenshots/admin-holds.jpg) | ![Borrowing records screen](docs/screenshots/admin-borrowing.jpg) |
+
+## Architecture
+
+```mermaid
+flowchart LR
+  Browser["React + Vite client"] -->|Axios /api/v1 + HTTP-only JWT cookie| API["Express TypeScript API"]
+  API --> Auth["Auth and role middleware"]
+  API --> Domain["Books, holds, borrowing, ratings, notifications"]
+  Domain --> Mongo["MongoDB + Mongoose models"]
+  API --> Mail["Nodemailer SMTP"]
+  API --> Cloudinary["Cloudinary book-cover uploads"]
+  API --> Jobs["node-cron overdue and unverified-account jobs"]
+```
+
+## Demo Accounts
+
+Seed local demonstration accounts with:
+
+```bash
+pnpm seed:demo
+```
+
+| Role | Email | Password |
+|---|---|---|
+| User | `demo.user@gotham-library.test` | `Demo123!` |
+| Administrator | `demo.admin@gotham-library.test` | `Demo123!` |
+
+These accounts are intentionally marked verified by the seed script so reviewers can test the user and administrator flows without email delivery.
+
+## Key Engineering Decisions
+
+- **TypeScript across the active stack:** the backend source lives in `server/src`, the frontend is React + TypeScript, and the old root-level JavaScript backend has been removed to keep the canonical implementation obvious.
+- **Hold-first circulation workflow:** patrons place holds, administrators approve them, inventory is reserved at approval time, and approved holds convert into fulfilled checkout records without double-decrementing quantity.
+- **HTTP-only cookie authentication:** JWTs are issued by the API and stored in HTTP-only cookies, with route middleware separating user and administrator access.
+- **Focused automated tests:** Node's built-in test runner covers the high-value backend rules around registration, verification, login, authorization, duplicate holds, hold approval, checkout fulfillment, returns, and availability notifications.
+- **Operational integrations kept behind services:** email, scheduled jobs, Cloudinary uploads, and persistence are isolated behind server utilities/services so product logic remains easier to test.
 
 ## 📋 Project Structure
 
@@ -114,6 +168,7 @@ The backend API is built with:
 ```bash
 cd server
 pnpm dev        # Development with hot reload (tsx)
+pnpm seed:demo  # Seed verified user/admin demo accounts
 pnpm test       # Run focused backend tests
 pnpm build      # Build TypeScript to JavaScript
 pnpm start      # Production

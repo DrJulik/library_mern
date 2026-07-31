@@ -114,6 +114,7 @@ The backend API is built with:
 ```bash
 cd server
 pnpm dev        # Development with hot reload (tsx)
+pnpm test       # Run focused backend tests
 pnpm build      # Build TypeScript to JavaScript
 pnpm start      # Production
 pnpm typecheck  # Type checking

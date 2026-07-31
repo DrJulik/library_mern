@@ -7,6 +7,7 @@
     "dev": "pnpm --parallel --stream run dev",
     "dev:server": "pnpm --filter server dev",
     "dev:client": "pnpm --filter client dev",
+    "test": "pnpm --filter server test",
     "start:server": "pnpm --filter server start",
     "start:client": "pnpm --filter client start",
     "build:client": "pnpm --filter client build",
@@ -20,4 +21,3 @@
   "author": "",
   "license": "ISC"
 }
-

@@ -66,6 +66,11 @@ pnpm build
 pnpm start
 ```
 
+### Run Tests
+```bash
+pnpm test
+```
+
 ### Type Check Only
 ```bash
 pnpm typecheck
@@ -204,4 +209,3 @@ ISC
 ---
 
 **Built with ❤️ and TypeScript**
-
